@@ -1,0 +1,426 @@
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error:   File "Assets/Python/main.py", line 13
+    print(f"Output written to {file_path}")
+                                         ^
+SyntaxError: invalid syntax
+
+Output file was not created.
+Starting Python script...
+Python process started.
+Python Output: Python script is running successfully!
+Output written to Assets/Python/output.txt
+
+Output file created successfully.
+Output file content: Python script executed successfully!
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 4, in <module>
+    import pybullet as p
+ImportError: No module named pybullet
+
+Output file created successfully.
+Output file content: Python script executed successfully!
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Output file created successfully.
+Output file content: Python script executed successfully!
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Output file was not created.
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Output file was not created.
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Output file was not created.
+Successfully wrote 'Hello Python' to Assets/Python/output.txt
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Output file created successfully.
+Output file content: Hello Python
+
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Output file created successfully.
+Output file content: Hello Python
+
+Starting Python script...
+Python process started.
+Python Output: 
+Python Error: Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Output file created successfully.
+Output file content: Hello Python
+
+Starting Python script...
+Python process started.
+Python Output:
+
+Python Error:
+Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Starting Python script...
+Python process started.
+Python Output:
+
+Python Error:
+Traceback (most recent call last):
+  File "Assets/Python/main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 12
+    print(f'Server listening on {host}:{port}')
+                                             ^
+SyntaxError: invalid syntax
+
+Starting Python script...
+Python process started.
+Python Output:
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+Traceback (most recent call last):
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\main.py", line 3, in <module>
+    import TCP
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\TCP.py", line 4, in <module>
+    import bullett
+  File "D:\Unity Projects\Interfacing Pybullet\Assets\Python\bullett.py", line 10, in <module>
+    from scipy.spatial.transform import Rotation as R
+ModuleNotFoundError: No module named 'scipy'
+
+Starting Python script...
+Python process started.
+Python Output:
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+Traceback (most recent call last):
+  File "C:\Users\Ayman Tarek\PycharmProjects\pythonProject1\main.py", line 3, in <module>
+    import TCP
+  File "C:\Users\Ayman Tarek\PycharmProjects\pythonProject1\TCP.py", line 4, in <module>
+    import bullett
+  File "C:\Users\Ayman Tarek\PycharmProjects\pythonProject1\bullett.py", line 10, in <module>
+    from scipy.spatial.transform import Rotation as R
+ModuleNotFoundError: No module named 'scipy'
+
+Starting Python script...
+Python process started.
+Python Output:
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+
+Starting Python script...
+Python process started.
+Python Output:
+starting thread 0
+started testThreads thread 0 with threadHandle 0000000000000184
+argc=2
+argv[0] = --unused
+argv[1] = --start_demo_name=Physics Server
+ExampleBrowserThreadFunc started
+Version = 4.6.0 Compatibility Profile Context 22.20.44.221025
+Vendor = ATI Technologies Inc.
+Renderer = AMD Radeon(TM) Graphics
+b3Printf: Selected demo: Physics Server
+starting thread 0
+started MotionThreads thread 0 with threadHandle 00000000000005E8
+MotionThreadFunc thread started
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 with handle 00000000000005E8 exiting
+Thread TERMINATED
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 with handle 0000000000000184 exiting
+Thread TERMINATED
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+Traceback (most recent call last):
+  File "C:\Users\Ayman Tarek\PycharmProjects\Bullet Unity\main.py", line 24, in <module>
+    p.stepSimulation()
+pybullet.error: Not connected to physics server.
+
+Starting Python script...
+Python process started.
+Python Output:
+starting thread 0
+started testThreads thread 0 with threadHandle 00000000000001F4
+argc=2
+argv[0] = --unused
+argv[1] = --start_demo_name=Physics Server
+ExampleBrowserThreadFunc started
+Version = 4.6.0 Compatibility Profile Context 22.20.44.221025
+Vendor = ATI Technologies Inc.
+Renderer = AMD Radeon(TM) Graphics
+b3Printf: Selected demo: Physics Server
+starting thread 0
+started MotionThreads thread 0 with threadHandle 00000000000005F0
+MotionThreadFunc thread started
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 with handle 00000000000005F0 exiting
+Thread TERMINATED
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 with handle 00000000000001F4 exiting
+Thread TERMINATED
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+Traceback (most recent call last):
+  File "C:\Users\Ayman Tarek\PycharmProjects\Bullet Unity\main.py", line 24, in <module>
+    p.stepSimulation()
+pybullet.error: Not connected to physics server.
+
+Starting Python script...
+Python process started.
+Python Output:
+starting thread 0
+started testThreads thread 0 with threadHandle 00000000000001E4
+argc=2
+argv[0] = --unused
+argv[1] = --start_demo_name=Physics Server
+ExampleBrowserThreadFunc started
+Version = 4.6.0 Compatibility Profile Context 22.20.44.221025
+Vendor = ATI Technologies Inc.
+Renderer = AMD Radeon(TM) Graphics
+b3Printf: Selected demo: Physics Server
+starting thread 0
+started MotionThreads thread 0 with threadHandle 00000000000005E8
+MotionThreadFunc thread started
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 with handle 00000000000005E8 exiting
+Thread TERMINATED
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 with handle 00000000000001E4 exiting
+Thread TERMINATED
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+Traceback (most recent call last):
+  File "C:\Users\Ayman Tarek\PycharmProjects\Bullet Unity\main.py", line 24, in <module>
+    p.stepSimulation()
+pybullet.error: Not connected to physics server.
+
+Starting Python script...
+Python process started.
+Python Output:
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+
+Starting Python script...
+Python process started.
+Python Output:
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+
+Starting Python script...
+Python process started.
+Starting Python script...
+Python process started.
+Python Output:
+starting thread 0
+started testThreads thread 0 with threadHandle 0000000000000178
+argc=2
+argv[0] = --unused
+argv[1] = --start_demo_name=Physics Server
+ExampleBrowserThreadFunc started
+Version = 4.6.0 Compatibility Profile Context 22.20.44.221025
+Vendor = ATI Technologies Inc.
+Renderer = AMD Radeon(TM) Graphics
+b3Printf: Selected demo: Physics Server
+starting thread 0
+started MotionThreads thread 0 with threadHandle 00000000000009DC
+MotionThreadFunc thread started
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 with handle 00000000000009DC exiting
+Thread TERMINATED
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 with handle 0000000000000178 exiting
+Thread TERMINATED
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+Exception in thread Thread-1 (main):
+Traceback (most recent call last):
+  File "C:\Python311\Lib\threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "C:\Python311\Lib\threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Ayman Tarek\PycharmProjects\Bullet Unity\bullett.py", line 152, in main
+    p.stepSimulation()
+pybullet.error: Not connected to physics server.
+
+Starting Python script...
+Python process started.
+Python Output:
+starting thread 0
+started testThreads thread 0 with threadHandle 000000000000017C
+argc=2
+argv[0] = --unused
+argv[1] = --start_demo_name=Physics Server
+ExampleBrowserThreadFunc started
+Version = 4.6.0 Compatibility Profile Context 22.20.44.221025
+Vendor = ATI Technologies Inc.
+Renderer = AMD Radeon(TM) Graphics
+b3Printf: Selected demo: Physics Server
+starting thread 0
+started MotionThreads thread 0 with threadHandle 00000000000009BC
+MotionThreadFunc thread started
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 with handle 00000000000009BC exiting
+Thread TERMINATED
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 with handle 000000000000017C exiting
+Thread TERMINATED
+
+Python Error:
+pybullet build time: Jul 20 2024 21:48:44
+Exception in thread Thread-1 (main):
+Traceback (most recent call last):
+  File "C:\Python311\Lib\threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "C:\Python311\Lib\threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Ayman Tarek\PycharmProjects\Bullet Unity\bullett.py", line 152, in main
+    p.stepSimulation()
+pybullet.error: Not connected to physics server.
+
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
+Starting Python script...
+Python process started asynchronously.
+Quitting the application.
