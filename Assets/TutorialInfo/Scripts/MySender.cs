@@ -30,7 +30,7 @@ public class MySender : MonoBehaviour
         }
     }
 
-    public void Start()
+    public void StartSimulation()
     {
         objectData = obj.GetComponent<ObjectData>();
         runPythonScript = pythonRun.GetComponent<RunPythonScript>();

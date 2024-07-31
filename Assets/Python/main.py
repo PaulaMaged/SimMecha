@@ -4,7 +4,6 @@ import TCP
 import bullett
 
 
-
 def main():
     # Create and start threads
     pybullet_thread = threading.Thread(target=bullett.main)

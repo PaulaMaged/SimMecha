@@ -1,5 +1,7 @@
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -9,7 +11,7 @@ public class RunPythonScript : MonoBehaviour
     private string pythonScriptPath = "Assets/Python/main.py";
 
     // Path to the Python executable
-    private string pythonExePath = "Assets/Python/python.exe"; // Update this path if needed
+    private string pythonExePath = null;
 
     // Path to the log file
     private string logFilePath = "Assets/Python/log.txt";
@@ -19,15 +21,20 @@ public class RunPythonScript : MonoBehaviour
         // Log the start of the process
         Log("Starting Python script...");
 
-        if (!File.Exists(pythonExePath))
+        // Search for python.exe in common locations
+        pythonExePath = FindPythonExecutable();
+
+        if (pythonExePath == null)
         {
-            Log($"Python executable not found at: {pythonExePath}");
+            Debug.Log("Python executable not found.");
+            LogError("Python executable not found.");
             return;
         }
 
         if (!File.Exists(pythonScriptPath))
         {
-            Log($"Python script not found at: {pythonScriptPath}");
+            Debug.Log($"Python script not found at: {pythonScriptPath}");
+            LogError($"Python script not found at: {pythonScriptPath}");
             return;
         }
 
@@ -56,15 +63,50 @@ public class RunPythonScript : MonoBehaviour
         {
             LogError("Failed to start Python process: " + ex.Message);
         }
+    }
 
-        // Quit the application immediately after starting the Python script
-        Log("Quitting the application.");
-        Application.Quit();
+    private string FindPythonExecutable()
+    {
+        string[] commonPaths = {
+            @"C:\Python39\python.exe",
+            @"C:\Python38\python.exe",
+            @"C:\Python37\python.exe",
+            @"C:\Python36\python.exe",
+            @"C:\Python35\python.exe",
+            @"C:\Python34\python.exe",
+            @"C:\Python33\python.exe",
+            @"C:\Python32\python.exe",
+            @"C:\Python31\python.exe",
+            @"C:\Python30\python.exe"
+        };
 
-        // If running in the editor, stop playing
-//#if UNITY_EDITOR
-//        UnityEditor.EditorApplication.isPlaying = false;
-//#endif
+        // Check common installation paths
+        foreach (string path in commonPaths)
+        {
+            if (File.Exists(path))
+            {
+                Debug.Log("Found path in example paths: " + path);
+                return path;
+            }
+        }
+
+        // Check the PATH environment variable
+        string pathEnv = Environment.GetEnvironmentVariable("PATH");
+        if (pathEnv != null)
+        {
+            string[] pathDirs = pathEnv.Split(Path.PathSeparator);
+            foreach (string dir in pathDirs)
+            {
+                string fullPath = Path.Combine(dir, "python.exe");
+                if (File.Exists(fullPath))
+                {
+                    Debug.Log("Found path in environment variables: " +  fullPath);
+                    return fullPath;
+                }
+            }
+        }
+
+        return null;
     }
 
     void Log(string message)
