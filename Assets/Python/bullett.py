@@ -141,7 +141,7 @@ def main():
     physicsClient = connect_to_pybullet()
     plane_id = load_environment()
 
-    urdf_path = "Assets/pybullet_data/franka_panda/panda.urdf"
+    urdf_path = "Assets/franka_panda/panda.urdf"
 
     robot_id = load_robot(urdf_path, positions[0], orientations[0], 3)
     num_joints = p.getNumJoints(robot_id)
