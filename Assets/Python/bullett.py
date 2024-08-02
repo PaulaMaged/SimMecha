@@ -1,15 +1,16 @@
+import os
+import sys
+
 import pybullet as p
 import pybullet_data
 import time
 import math
 import numpy as np
-import socket
-import threading
 import TCP
-import multiprocessing
 from scipy.spatial.transform import Rotation as R
 
 received_data = ""
+
 
 def connect_to_pybullet():
     physicsClient = p.connect(p.GUI)
@@ -21,11 +22,13 @@ def load_environment():
     planeId = p.loadURDF("plane.urdf")
     return planeId
 
+
 # axes orientation in unity are different than pybullet
 def convert_coords(unity_coords):
     x, y, z = unity_coords
     pybullet_coords = (x, z, y)
     return pybullet_coords
+
 
 def transform_quaternion(q):
     # Convert the input quaternion to a rotation matrix
@@ -48,9 +51,12 @@ def transform_quaternion(q):
 
     return new_quaternion
 
+
 def load_robot(urdf_path, position_vector, orientation_vector, scaling):
-    robotId = p.loadURDF(urdf_path, convert_coords(position_vector), baseOrientation=transform_quaternion(orientation_vector), globalScaling=scaling)
+    robotId = p.loadURDF(urdf_path, convert_coords(position_vector),
+                         baseOrientation=transform_quaternion(orientation_vector), globalScaling=scaling)
     return robotId
+
 
 def set_gravity(gravity_vector):
     p.setGravity(*gravity_vector)
@@ -60,6 +66,7 @@ def get_joint_axis(robot_id, joint_index):
     joint_info = p.getLinkState(robot_id, joint_index)
     joint_axis = joint_info[5]  # Extract the joint axis (local frame)
     return joint_axis
+
 
 def create_joint_constraint(first_obj, first_joint, second_obj, second_joint, joint_type, joint_axis=-1):
     # Get the joint info to determine the link ID and joint axis
@@ -83,14 +90,14 @@ def apply_external_force(robot_id, link_index, force, position, duration):
     for i in range(duration):
         p.applyExternalForce(robot_id, link_index, force, position, p.WORLD_FRAME)
         p.stepSimulation()
-        time.sleep(1./240.)
+        time.sleep(1. / 240.)
 
 
 def apply_torque(robot_id, link_index, torque, duration):
     for i in range(duration):
         p.applyExternalTorque(robot_id, link_index, torque, p.LINK_FRAME)
         p.stepSimulation()
-        time.sleep(1./240.)
+        time.sleep(1. / 240.)
 
 
 def apply_joint_torque(robot_id, joint_index, torque):
@@ -131,10 +138,11 @@ def unlock_link(robot_id, joint_index):
         force=0
     )
 
-def main():
 
+def py_main():
     while received_data == "":
         continue
+    print("data received")
 
     positions, orientations = TCP.parse_message(received_data)
 
@@ -150,4 +158,9 @@ def main():
 
     while True:
         p.stepSimulation()
-        time.sleep(1./240.)
+        time.sleep(1. / 240.)
+        if p.getConnectionInfo(physicsClient)['isConnected'] == 0:
+            print("PyBullet window closed.")
+            TCP.sock.close()
+            print("socket should have been closed")
+            os._exit(0)
