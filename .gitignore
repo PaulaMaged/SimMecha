@@ -25,7 +25,8 @@
 
 # Visual Studio cache directory
 .vs/
-.vsconfig/
+.vscode/
+.vsconfig
 # Gradle cache directory
 .gradle/
 
@@ -70,3 +71,11 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# python files
+/[Aa]ssets/Python/__pycache__/
+/[Aa]ssets/Python/__pycache__.meta
+/[Aa]ssets/Python/log.txt
+
+# pybullet files
+/Assets/pybullet_data/
