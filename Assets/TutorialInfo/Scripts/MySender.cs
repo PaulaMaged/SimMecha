@@ -38,7 +38,7 @@ public class MySender : MonoBehaviour
         runPythonScript.RunPython();
 
         Debug.Log("Hellooo");
-        Connect("127.0.0.1", 65432); // Replace with your server IP and port
+        Connect("172.20.144.1", 65432); // Replace with your server IP and port
 
         objectData.sendObjectData();
     }
