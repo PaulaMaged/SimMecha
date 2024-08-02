@@ -1,20 +1,24 @@
+import multiprocessing
 import threading
 
 import TCP
 import bullett
 
-
 def main():
-    # Create and start threads
-    pybullet_thread = threading.Thread(target=bullett.main)
-    tcp_thread = threading.Thread(target=TCP.start_server)
 
-    pybullet_thread.start()
-    tcp_thread.start()
+    # Create and start processes
+    pybullet_process = threading.Thread(target=bullett.py_main)
+    tcp_process = threading.Thread(target=TCP.start_server)
 
-    # Join threads to ensure they complete
-    pybullet_thread.join()
-    tcp_thread.join()
+    pybullet_process.start()
+    tcp_process.start()
+
+    # Join processes to ensure they complete
+    pybullet_process.join()
+    # tcp_process.join()
+
+
+
 
 
 if __name__ == '__main__':

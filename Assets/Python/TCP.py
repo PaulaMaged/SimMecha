@@ -3,18 +3,17 @@ import re
 
 import bullett
 
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # handles communication between unity and python
 def start_server(host='127.0.0.1', port=65432):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-
+    with sock as s:
         #This line sets the SO_REUSEADDR option on the socket,
         # which allows the server to bind to the port even if it is in the TIME_WAIT state after being closed.
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         s.bind((host, port))
         s.listen()
-        print(f'Server listening on {host}:{port}')
         conn, addr = s.accept()
         with conn:
             print(f'Connected by {addr}')
