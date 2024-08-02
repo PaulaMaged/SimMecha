@@ -21,7 +21,6 @@ public class RunPythonScript : MonoBehaviour
         // Log the start of the process
         Log("Starting Python script...");
 
-<<<<<<< HEAD
         // Search for python.exe in common locations
         pythonExePath = FindPythonExecutable();
 
@@ -29,22 +28,13 @@ public class RunPythonScript : MonoBehaviour
         {
             Debug.Log("Python executable not found.");
             LogError("Python executable not found.");
-=======
-        if (!File.Exists(pythonExePath))
-        {
-            Log($"Python executable not found at: {pythonExePath}");
->>>>>>> origin/dev
             return;
         }
 
         if (!File.Exists(pythonScriptPath))
         {
-<<<<<<< HEAD
             Debug.Log($"Python script not found at: {pythonScriptPath}");
             LogError($"Python script not found at: {pythonScriptPath}");
-=======
-            Log($"Python script not found at: {pythonScriptPath}");
->>>>>>> origin/dev
             return;
         }
 
@@ -73,7 +63,6 @@ public class RunPythonScript : MonoBehaviour
         {
             LogError("Failed to start Python process: " + ex.Message);
         }
-<<<<<<< HEAD
     }
 
     private string FindPythonExecutable()
@@ -118,17 +107,6 @@ public class RunPythonScript : MonoBehaviour
         }
 
         return null;
-=======
-
-        // Quit the application immediately after starting the Python script
-        // Log("Quitting the application.");
-        // Application.Quit();
-
-        // If running in the editor, stop playing
-//#if UNITY_EDITOR
-//        UnityEditor.EditorApplication.isPlaying = false;
-//#endif
->>>>>>> origin/dev
     }
 
     void Log(string message)
