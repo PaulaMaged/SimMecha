@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using SFB; // Namespace for StandaloneFileBrowser
 
 public class SimulIDEScript : MonoBehaviour
 {
@@ -17,27 +18,28 @@ public class SimulIDEScript : MonoBehaviour
         }
 
         LoadSimulIDEPath();
-
-        if (string.IsNullOrEmpty(simulIDEPath) || !File.Exists(simulIDEPath))
-        {
-            simulIDEPath = SearchForSimulIDE();
-            if (!string.IsNullOrEmpty(simulIDEPath))
-            {
-                SaveSimulIDEPath(simulIDEPath);
-            }
-            else
-            {
-                UnityEngine.Debug.LogWarning("SimulIDE executable not found.");
-            }
-        }
     }
 
     void OpenSimulIDE()
     {
         if (string.IsNullOrEmpty(simulIDEPath) || !File.Exists(simulIDEPath))
         {
-            UnityEngine.Debug.LogWarning("SimulIDE executable not set or not found.");
-            return;
+            var extensions = new[] {
+                new ExtensionFilter("Executable Files", "exe"),
+                new ExtensionFilter("All Files", "*"),
+            };
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Select SimulIDE Executable", "", extensions, false);
+
+            if (paths.Length > 0)
+            {
+                simulIDEPath = paths[0];
+                SaveSimulIDEPath(simulIDEPath);
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning("No file selected.");
+                return;
+            }
         }
 
         ProcessStartInfo startInfo = new ProcessStartInfo
@@ -46,30 +48,6 @@ public class SimulIDEScript : MonoBehaviour
             UseShellExecute = true
         };
         Process.Start(startInfo);
-    }
-
-    string SearchForSimulIDE()
-    {
-        string[] commonPaths = {
-            @"C:\Program Files\SimulIDE\simulide.exe",
-            @"C:\Program Files (x86)\SimulIDE\simulide.exe",
-            @"C:\Users\" + System.Environment.UserName + @"\AppData\Local\Programs\SimulIDE\simulide.exe",
-            @"/usr/bin/simulide",
-            @"/usr/local/bin/simulide",
-            @"/opt/simulide/bin/simulide"
-        };
-
-        foreach (string path in commonPaths)
-        {
-            if (File.Exists(path))
-            {
-                return path;
-            }
-        }
-
-        // Additional search logic (e.g., scanning directories) can be added here
-
-        return null;
     }
 
     void SaveSimulIDEPath(string path)

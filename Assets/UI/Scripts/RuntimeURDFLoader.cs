@@ -11,6 +11,7 @@ public class RuntimeURDFLoader : MonoBehaviour
     public static List<GameObject> ImportedRobots;
     private ArticulationBody[] articulationBodies; 
     private Vector3 previousPosition;
+    private Quaternion previousRotation; // Track previous rotation
 
     void Start()
     {
@@ -73,8 +74,9 @@ public class RuntimeURDFLoader : MonoBehaviour
                 // Cache articulation bodies
                 articulationBodies = robot.GetComponentsInChildren<ArticulationBody>();
 
-                // Initialize previous position
+                // Initialize previous position and rotation
                 previousPosition = robot.transform.position;
+                previousRotation = robot.transform.rotation;
 
                 Debug.Log("URDF model imported, positioned, and tagged successfully.");
             }
@@ -102,8 +104,9 @@ public class RuntimeURDFLoader : MonoBehaviour
     {
         if (robot != null)
         {
-            // Check if the robot is moving
-            if (Vector3.Distance(robot.transform.position, previousPosition) > 0.01f)
+            // Check if the robot is moving or rotating
+            if (Vector3.Distance(robot.transform.position, previousPosition) > 0.01f ||
+                Quaternion.Angle(robot.transform.rotation, previousRotation) > 0.1f)
             {
                 // Disable all articulation bodies
                 SetArticulationBodiesEnabled(false);
@@ -114,8 +117,9 @@ public class RuntimeURDFLoader : MonoBehaviour
                 SetArticulationBodiesEnabled(true);
             }
 
-            // Update previous position
+            // Update previous position and rotation
             previousPosition = robot.transform.position;
+            previousRotation = robot.transform.rotation;
         }
     }
 
