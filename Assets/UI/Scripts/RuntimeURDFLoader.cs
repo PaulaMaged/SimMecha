@@ -1,12 +1,15 @@
 using UnityEngine;
 using Unity.Robotics.UrdfImporter;
 using SFB; // StandaloneFileBrowser namespace
+using System.Collections;
+using System.Collections.Generic;
 
 public class RuntimeURDFLoader : MonoBehaviour
 {
     public ImportSettings importSettings;
     private GameObject robot;
-    private ArticulationBody[] articulationBodies;
+    public static List<GameObject> ImportedRobots;
+    private ArticulationBody[] articulationBodies; 
     private Vector3 previousPosition;
 
     void Start()
@@ -24,6 +27,8 @@ public class RuntimeURDFLoader : MonoBehaviour
                 linksLoaded = 0
             };
         }
+
+        ImportedRobots = new List<GameObject>();
     }
 
     // Method to open file dialog and import URDF file
@@ -60,8 +65,10 @@ public class RuntimeURDFLoader : MonoBehaviour
                 Vector3 desiredPosition = new Vector3(0, 5, 0); // Example coordinates
                 robot.transform.position = desiredPosition;
 
+                ImportedRobots.Add(robot);
+
                 // Set the tag to "Selectable" for the root object and all its children
-                SetTagRecursively(robot, "Selectable");
+                // SetTagRecursively(robot, "Selectable");
 
                 // Cache articulation bodies
                 articulationBodies = robot.GetComponentsInChildren<ArticulationBody>();
