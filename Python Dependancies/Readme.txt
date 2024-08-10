@@ -1,0 +1,3 @@
+- Click on install_dependencies.bat batch file to install the python dependencies.
+- If you want to add more libraries, open requirements.txt and add it
+- Make sure that Python.exe is added to your environment variables.

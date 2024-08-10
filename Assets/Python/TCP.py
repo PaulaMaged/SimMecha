@@ -6,7 +6,7 @@ import bullett
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # handles communication between unity and python
-def start_server(host='127.0.0.1', port=65432):
+def start_server(host='127.0.0.1', port=3000):
     with sock as s:
         #This line sets the SO_REUSEADDR option on the socket,
         # which allows the server to bind to the port even if it is in the TIME_WAIT state after being closed.
