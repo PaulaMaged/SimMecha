@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro; // For TextMesh Pro
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 public class ShowHierarchyMenu : MonoBehaviour
 {
@@ -26,64 +28,61 @@ public class ShowHierarchyMenu : MonoBehaviour
             // Instantiate the prefab
             GameObject item = Instantiate(hierarchyItemPrefab, contentTransform);
 
-            // Set the robot name in the button text
-            TMP_Text itemText = item.GetComponentInChildren<TMP_Text>();
-            if (itemText != null)
-            {
-                itemText.text = robot.name;
-            }
-
-            Button itemButton = item.GetComponent<Button>();
+            Button itemButton = item.GetComponentInChildren<Button>();
             if (itemButton != null)
             {
-                // Pass the robot GameObject to the OnItemClick method
+                TMP_Text itemButtonText = itemButton.GetComponentInChildren<TMP_Text>();
+                itemButtonText.text = robot.name;
+            
                 itemButton.onClick.AddListener(() => OnItemClick(robot, item));
             }
 
             // Find the LinkMenu and MotorMenu in the prefab
-            Transform linkMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectLinkMenu/Template");
-            Transform motorMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectMotorMenu/Template");
+            TMP_Dropdown[] dropdowns = item.GetComponentsInChildren<TMP_Dropdown>();
+        
+            TMP_Dropdown linkMenuDropdown = FindDropdownByName(dropdowns, "SelectLinkMenu");
+            TMP_Dropdown motorMenuDropdown = FindDropdownByName(dropdowns, "SelectMotorMenu");
 
             // Populate the LinkMenu with links
-            if (linkMenuTransform != null)
+            if (linkMenuDropdown != null)
             {
                 foreach (Transform link in robot.transform)
                 {
-                    GameObject linkItem = Instantiate(linkMenuTransform.gameObject, linkMenuTransform.parent);
-                    linkItem.SetActive(true);
-
-                    TMP_Text linkItemText = linkItem.GetComponentInChildren<TMP_Text>();
-                    if (linkItemText != null)
-                    {
-                        linkItemText.text = link.name;
-                    }
+                    linkMenuDropdown.options.Add(new TMP_Dropdown.OptionData(link.name));
                 }
 
-                linkMenuTransform.gameObject.SetActive(false); // Hide the template
+                linkMenuDropdown.gameObject.SetActive(false);
             }
 
             // Populate the MotorMenu with motors
-            if (motorMenuTransform != null)
+            if (motorMenuDropdown != null)
             {
                 foreach (string motor in motorList)
                 {
-                    GameObject motorItem = Instantiate(motorMenuTransform.gameObject, motorMenuTransform.parent);
-                    motorItem.SetActive(true);
-
-                    TMP_Text motorItemText = motorItem.GetComponentInChildren<TMP_Text>();
-                    if (motorItemText != null)
-                    {
-                        motorItemText.text = motor;
-                    }
+                    motorMenuDropdown.options.Add(new TMP_Dropdown.OptionData(motor));
                 }
 
-                motorMenuTransform.gameObject.SetActive(false); // Hide the template
+                motorMenuDropdown.gameObject.SetActive(false);
             }
         }
     }
 
+    
+    TMP_Dropdown FindDropdownByName(TMP_Dropdown[] dropdownList, string targetName)
+    {
+        foreach (TMP_Dropdown dropdown in dropdownList)
+        {
+            if (dropdown.name == targetName)
+            {
+                return dropdown; // Return the matching dropdown
+            }
+        }
+        return null; // Return null if not found
+    }
+
     private void OnItemClick(GameObject robotObject, GameObject item)
     {
+        
         // Find the LinkMenu and MotorMenu in the prefab
         Transform linkMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectLinkMenu");
         Transform motorMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectMotorMenu");
@@ -101,7 +100,7 @@ public class ShowHierarchyMenu : MonoBehaviour
         }
     }
 
-    private void PopulateHierarchy(GameObject root)
+    private void PopulateHierarchy()
     {
         ClearHierarchy();
         CreateHierarchyItems();
@@ -124,6 +123,7 @@ public class ShowHierarchyMenu : MonoBehaviour
         else
         {
             hierarchyPanel.SetActive(true);
+            PopulateHierarchy();
         }
     }
 }
