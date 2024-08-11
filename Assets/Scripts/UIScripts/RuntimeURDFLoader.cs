@@ -11,6 +11,7 @@ public class RuntimeURDFLoader : MonoBehaviour
     private List<ArticulationBody[]> articulationBodiesList;
     private List<Vector3> previousPositions;
     private List<Quaternion> previousRotations;
+    private List<string> urdfFilePaths = new List<string>();
 
     void Start()
     {
@@ -47,6 +48,9 @@ public class RuntimeURDFLoader : MonoBehaviour
         {
             string urdfFilePath = paths[0];
             ImportURDF(urdfFilePath);
+            urdfFilePaths.Add(urdfFilePath);
+            Debug.Log("URDF file path added to the list: " + urdfFilePath);
+
         }
         else
         {
