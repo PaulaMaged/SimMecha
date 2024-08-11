@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro; // For TextMesh Pro
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Unity.Robotics.UrdfImporter;
 
 public class ShowHierarchyMenu : MonoBehaviour
 {
@@ -48,7 +49,7 @@ public class ShowHierarchyMenu : MonoBehaviour
             {
                 foreach (Transform link in robot.transform)
                 {
-                    linkMenuDropdown.options.Add(new TMP_Dropdown.OptionData(link.name));
+                    AddLinksToLinkMenu(linkMenuDropdown, link);
                 }
 
                 linkMenuDropdown.gameObject.SetActive(false);
@@ -66,6 +67,23 @@ public class ShowHierarchyMenu : MonoBehaviour
             }
         }
     }
+
+    private static void AddLinksToLinkMenu(TMP_Dropdown linkMenuDropdown, Transform parent)
+    {
+        // Check if the object has a component named "UrdfLink"
+        if (parent.GetComponent<UrdfLink>() != null)
+        {
+            // Add the link's name to the dropdown options
+            linkMenuDropdown.options.Add(new TMP_Dropdown.OptionData(parent.name));
+        }
+
+        // Recursively check the children
+        foreach (Transform child in parent)
+        {
+            AddLinksToLinkMenu(linkMenuDropdown, child);
+        }
+    }
+
 
     
     TMP_Dropdown FindDropdownByName(TMP_Dropdown[] dropdownList, string targetName)
