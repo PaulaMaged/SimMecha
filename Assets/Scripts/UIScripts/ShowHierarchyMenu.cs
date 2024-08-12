@@ -15,7 +15,7 @@ public class ShowHierarchyMenu : MonoBehaviour
     public GameObject hierarchyPanel; // Assign the hierarchy panel GameObject here
 
     private List<string> motorList = new List<string>();
-    private Dictionary<string, string> LinkMotorSelections = new Dictionary<string, string>();
+    private Dictionary<(int robotId, string linkName), string> LinkMotorSelections = new Dictionary<(int robotId, string linkName), string>();
 
     void Start()
     {
@@ -24,7 +24,7 @@ public class ShowHierarchyMenu : MonoBehaviour
         motorList.Add("motor1");
         motorList.Add("motor2");
     }
-    
+
     private void CreateHierarchyItems()
     {
         foreach (GameObject robot in RuntimeURDFLoader.ImportedRobots)
@@ -37,22 +37,26 @@ public class ShowHierarchyMenu : MonoBehaviour
             if (mainButton != null)
             {
                 TMP_Text itemButtonText = mainButton.GetComponentInChildren<TMP_Text>();
-                itemButtonText.text = robot.name;
-            
-                mainButton.onClick.AddListener(() => OnItemClick(item));
+                // Set button text to robot's original name and ID
+                int robotId = robot.GetComponent<RobotIdentifier>().robotId;
+                itemButtonText.text = $"{robot.name} (ID: {robotId})";
+
+                // Use the robot ID in the OnItemClick listener if needed
+                mainButton.onClick.AddListener(() => OnItemClick(item, robotId));
             }
-            
+
             Button confirmSelectionButton = buttons.FirstOrDefault(button => button.gameObject.name == "ConfirmSelectionButton");
             if (confirmSelectionButton != null)
             {
                 Debug.Log("Confirm Button is available");
-                confirmSelectionButton.onClick.AddListener(StoreDropdownSelections);
+                // Pass robot ID to StoreDropdownSelections if needed
+                confirmSelectionButton.onClick.AddListener(() => StoreDropdownSelections(robot.GetComponent<RobotIdentifier>().robotId));
                 confirmSelectionButton.gameObject.SetActive(false);
             }
 
             // Find the LinkMenu and MotorMenu in the prefab
             TMP_Dropdown[] dropdowns = item.GetComponentsInChildren<TMP_Dropdown>();
-        
+
             TMP_Dropdown linkMenuDropdown = FindDropdownByName(dropdowns, "SelectLinkMenu");
             TMP_Dropdown motorMenuDropdown = FindDropdownByName(dropdowns, "SelectMotorMenu");
 
@@ -80,6 +84,7 @@ public class ShowHierarchyMenu : MonoBehaviour
         }
     }
 
+
     private static void AddLinksToLinkMenu(TMP_Dropdown linkMenuDropdown, Transform parent)
     {
         // Check if the object has a component named "UrdfLink"
@@ -96,40 +101,63 @@ public class ShowHierarchyMenu : MonoBehaviour
         }
     }
 
-    public void StoreDropdownSelections()
+    public void StoreDropdownSelections(int robotId)
     {
         // Retrieve the current event data
         PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+
         // Get the button that was clicked
         Button clickedButton = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
-
         if (clickedButton == null)
         {
-            Debug.Log("No Buttons found");
+            Debug.LogError("No button found in the clicked object.");
             return;
         }
 
         // Get the parent of the button
         Transform parentTransform = clickedButton.transform.parent;
-        if (parentTransform == null) return;
+        if (parentTransform == null)
+        {
+            Debug.LogError("No parent transform found.");
+            return;
+        }
 
-        // Find all TMP_Dropdown components in the parent
+        // Log the hierarchy to debug the issue
+        foreach (Transform child in parentTransform)
+        {
+            Debug.Log("Child of parentTransform: " + child.name);
+        }
+
+        // Find the button text component
+        TMP_Text buttonText = parentTransform.Find("AddMotorToRobotButton/Text (TMP)")?.GetComponent<TMP_Text>();
+        if (buttonText == null)
+        {
+            Debug.LogError("Button text object not found.");
+            return;
+        }
+
+        string robotName = buttonText.text;
+        Debug.Log("Selected robot: " + robotName);
+
+        // Find the dropdown components
         TMP_Dropdown[] dropdowns = parentTransform.GetComponentsInChildren<TMP_Dropdown>();
         TMP_Dropdown linkMenuDropdown = FindDropdownByName(dropdowns, "SelectLinkMenu");
         TMP_Dropdown motorMenuDropdown = FindDropdownByName(dropdowns, "SelectMotorMenu");
-        
+
+        if (linkMenuDropdown == null || motorMenuDropdown == null)
+        {
+            Debug.LogError("Dropdowns not found.");
+            return;
+        }
+
         string linkSelection = linkMenuDropdown.options[linkMenuDropdown.value].text;
         string motorSelection = motorMenuDropdown.options[motorMenuDropdown.value].text;
-        
-        LinkMotorSelections[linkSelection] = motorSelection;
 
-        Debug.Log("Stored selections: ");
-        foreach (var entry in LinkMotorSelections)
-        {
-            Debug.Log($"{entry.Key}: {entry.Value}");
-        }
+        // Store the selection using robotId instead of robotName
+        LinkMotorSelections[(robotId, linkSelection)] = motorSelection;
+        Debug.Log($"Stored selection: {robotId} -> {linkSelection} -> {motorSelection}");
     }
-    
+
     TMP_Dropdown FindDropdownByName(TMP_Dropdown[] dropdownList, string targetName)
     {
         foreach (TMP_Dropdown dropdown in dropdownList)
@@ -142,9 +170,8 @@ public class ShowHierarchyMenu : MonoBehaviour
         return null; // Return null if not found
     }
 
-    private void OnItemClick(GameObject item)
+    private void OnItemClick(GameObject item, int robotId)
     {
-        
         // Find the LinkMenu and MotorMenu in the prefab
         Transform linkMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectLinkMenu");
         Transform motorMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectMotorMenu");
@@ -161,7 +188,7 @@ public class ShowHierarchyMenu : MonoBehaviour
         {
             motorMenuTransform.gameObject.SetActive(!motorMenuTransform.gameObject.activeSelf);
         }
-        
+
         // Toggle the visibility of the Confirm Selection Button
         if (confirmSelectionButton != null)
         {
@@ -182,7 +209,7 @@ public class ShowHierarchyMenu : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
-    
+
     public void ToggleHierarchyMenu()
     {
         if (hierarchyPanel.activeSelf)

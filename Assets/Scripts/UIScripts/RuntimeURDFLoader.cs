@@ -4,6 +4,11 @@ using SFB; // StandaloneFileBrowser namespace
 using System.Collections;
 using System.Collections.Generic;
 
+public class RobotIdentifier : MonoBehaviour
+{
+    public int robotId;
+}
+
 public class RuntimeURDFLoader : MonoBehaviour
 {
     public ImportSettings importSettings;
@@ -12,6 +17,8 @@ public class RuntimeURDFLoader : MonoBehaviour
     private List<Vector3> previousPositions;
     private List<Quaternion> previousRotations;
     private List<string> urdfFilePaths = new List<string>();
+    private int nextRobotId = 1;
+    public static Dictionary<int, GameObject> RobotIdToGameObject = new Dictionary<int, GameObject>(); 
 
     void Start()
     {
@@ -33,6 +40,8 @@ public class RuntimeURDFLoader : MonoBehaviour
         articulationBodiesList = new List<ArticulationBody[]>();
         previousPositions = new List<Vector3>();
         previousRotations = new List<Quaternion>();
+        RobotIdToGameObject = new Dictionary<int, GameObject>(); 
+
     }
 
     // Method to open file dialog and import URDF file
@@ -78,6 +87,12 @@ public class RuntimeURDFLoader : MonoBehaviour
                 // Force the GameObject to be the last in the hierarchy
                 robot.transform.SetAsLastSibling(); // This will move it to the last index in the hierarchy
 
+                // Assign a unique identifier
+                RobotIdentifier identifier = robot.AddComponent<RobotIdentifier>();
+                identifier.robotId = nextRobotId++;
+
+                RobotIdToGameObject[identifier.robotId] = robot;
+
                 ImportedRobots.Add(robot);
 
                 // Cache articulation bodies
@@ -88,7 +103,7 @@ public class RuntimeURDFLoader : MonoBehaviour
                 previousPositions.Add(robot.transform.position);
                 previousRotations.Add(robot.transform.rotation);
 
-                Debug.Log("URDF model imported and positioned successfully.");
+                Debug.Log($"URDF model imported and positioned successfully with ID: {identifier.robotId}");
             }
             else
             {
@@ -143,4 +158,5 @@ public class RuntimeURDFLoader : MonoBehaviour
     {
         OpenFileAndImportURDF();
     }
+
 }
