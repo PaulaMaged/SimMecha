@@ -144,15 +144,17 @@ def py_main():
         continue
     print("data received")
 
-    positions, orientations = TCP.parse_message(received_data)
+    urls, positions, orientations = TCP.parse_message(received_data)
 
     physicsClient = connect_to_pybullet()
     plane_id = load_environment()
 
-    urdf_path = "Assets/pybullet_data/franka_panda/panda.urdf"
+    num_joints = []
 
-    robot_id = load_robot(urdf_path, positions[0], orientations[0], 3)
-    num_joints = p.getNumJoints(robot_id)
+    for i in range(len(urls)):
+        urdf_path = urls[i]
+        robot_id = load_robot(urdf_path, positions[i], orientations[i], 3)
+        num_joints.append(p.getNumJoints(robot_id))
 
     set_gravity([0, 0, -9.81])
 

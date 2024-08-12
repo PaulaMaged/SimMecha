@@ -73,12 +73,12 @@ public class MySender : MonoBehaviour
     }
 
     // receives data about gameObjects from ObjectData script
-    public void ReceiveData(string name, Vector3 position, Quaternion orientation)
+    public void ReceiveData(string url, Vector3 position, Quaternion orientation)
     {
         // Process the received data
-        Debug.Log(position.ToString() + " " + orientation.ToString());
+        Debug.Log(url + " " + position.ToString() + " " + orientation.ToString());
 
-        SendMessage(position.ToString() + " " + orientation.ToString());
+        SendMessage(url + " " + position.ToString() + " " + orientation.ToString());
 
         Debug.Log("e7m");
     }
