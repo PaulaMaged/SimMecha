@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro; // For TextMesh Pro
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Unity.Robotics.UrdfImporter;
 using UnityEngine.EventSystems;
@@ -53,6 +52,15 @@ public class ShowHierarchyMenu : MonoBehaviour
                 confirmSelectionButton.onClick.AddListener(() => StoreDropdownSelections(robot.GetComponent<RobotIdentifier>().robotId));
                 confirmSelectionButton.gameObject.SetActive(false);
             }
+            
+            Button deleteMotorLinkButton = buttons.FirstOrDefault(button => button.gameObject.name == "DeleteMotorLinkButton");
+            if (deleteMotorLinkButton != null)
+            {
+                Debug.Log("Confirm Button is available");
+                // Pass robot ID to StoreDropdownSelections if needed
+                deleteMotorLinkButton.onClick.AddListener(() => DeleteFromDictionary(robot.GetComponent<RobotIdentifier>().robotId));
+                deleteMotorLinkButton.gameObject.SetActive(false);
+            }
 
             // Find the LinkMenu and MotorMenu in the prefab
             TMP_Dropdown[] dropdowns = item.GetComponentsInChildren<TMP_Dropdown>();
@@ -82,6 +90,59 @@ public class ShowHierarchyMenu : MonoBehaviour
                 motorMenuDropdown.gameObject.SetActive(false);
             }
         }
+    }
+
+    private void DeleteFromDictionary(int robotId)
+    {
+        // Retrieve the current event data
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+
+        // Get the button that was clicked
+        Button clickedButton = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
+        if (clickedButton == null)
+        {
+            Debug.LogError("No button found in the clicked object.");
+            return;
+        }
+
+        // Get the prefab object Parent
+        Transform parentTransform = clickedButton.transform.parent.transform.parent;
+        if (parentTransform == null)
+        {
+            Debug.LogError("No parent transform found.");
+            return;
+        }
+
+        // Log the hierarchy to debug the issue
+        foreach (Transform child in parentTransform)
+        {
+            Debug.Log("Child of parentTransform: " + child.name);
+        }
+
+        // Find the dropdown components
+        TMP_Dropdown[] dropdowns = parentTransform.GetComponentsInChildren<TMP_Dropdown>();
+        TMP_Dropdown linkMenuDropdown = FindDropdownByName(dropdowns, "SelectLinkMenu");
+        TMP_Dropdown motorMenuDropdown = FindDropdownByName(dropdowns, "SelectMotorMenu");
+
+        if (linkMenuDropdown == null || motorMenuDropdown == null)
+        {
+            Debug.LogError("Dropdowns not found.");
+            return;
+        }
+
+        string linkSelection = linkMenuDropdown.options[linkMenuDropdown.value].text;
+        string motorSelection = motorMenuDropdown.options[motorMenuDropdown.value].text;
+
+        // Store the selection using robotId instead of robotName
+        if (LinkMotorSelections.Remove((robotId, linkSelection)))
+        {
+            Debug.Log($"Deleted selection: {robotId} -> {linkSelection} -> {motorSelection}");
+        }
+        else
+        {
+            Debug.Log("Link Motor selection was not found");
+        }
+        
     }
 
 
@@ -114,12 +175,18 @@ public class ShowHierarchyMenu : MonoBehaviour
             return;
         }
 
-        // Get the parent of the button
-        Transform parentTransform = clickedButton.transform.parent;
+        // Get the prefab object Parent
+        Transform parentTransform = clickedButton.transform.parent.transform.parent;
         if (parentTransform == null)
         {
             Debug.LogError("No parent transform found.");
             return;
+        }
+        
+        Button[] buttons = parentTransform.GetComponentsInChildren<Button>();
+        foreach (var button in buttons)
+        {
+            Debug.Log(button.name);
         }
 
         // Log the hierarchy to debug the issue
@@ -129,7 +196,8 @@ public class ShowHierarchyMenu : MonoBehaviour
         }
 
         // Find the button text component
-        TMP_Text buttonText = parentTransform.Find("AddMotorToRobotButton/Text (TMP)")?.GetComponent<TMP_Text>();
+        TMP_Text buttonText = buttons.FirstOrDefault(button => button.gameObject.name == "AddMotorToRobotButton")?
+            .GetComponentInChildren<TMP_Text>();
         if (buttonText == null)
         {
             Debug.LogError("Button text object not found.");
@@ -175,7 +243,8 @@ public class ShowHierarchyMenu : MonoBehaviour
         // Find the LinkMenu and MotorMenu in the prefab
         Transform linkMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectLinkMenu");
         Transform motorMenuTransform = item.transform.Find("SelectedLinkAndMotorMenus/SelectMotorMenu");
-        Transform confirmSelectionButton = item.transform.Find("ConfirmSelectionButton");
+        Transform confirmSelectionButton = item.transform.Find("Buttons/ConfirmSelectionButton");
+        Transform deleteMotorLinkButton = item.transform.Find("Buttons/DeleteMotorLinkButton");
 
         // Toggle the visibility of the LinkMenu
         if (linkMenuTransform != null)
@@ -193,6 +262,12 @@ public class ShowHierarchyMenu : MonoBehaviour
         if (confirmSelectionButton != null)
         {
             confirmSelectionButton.gameObject.SetActive(!confirmSelectionButton.gameObject.activeSelf);
+        }
+        
+        // Toggle the visibility of the Delete Link Motor Button
+        if (deleteMotorLinkButton != null)
+        {
+            deleteMotorLinkButton.gameObject.SetActive(!deleteMotorLinkButton.gameObject.activeSelf);
         }
     }
 
