@@ -17,6 +17,8 @@ public class MySender : MonoBehaviour
 
     public static MySender Instance;
 
+    public static int x = 0;
+    public static bool started = false;
     void Awake()
     {
         // Ensure there's only one instance of ReceiverScript
@@ -35,17 +37,24 @@ public class MySender : MonoBehaviour
         objectData = obj.GetComponent<ObjectData>();
         runPythonScript = pythonRun.GetComponent<RunPythonScript>();
 
-        runPythonScript.RunPython();
+        //runPythonScript.RunPython();
 
         Debug.Log("Hellooo");
-        Connect("127.0.0.1", 3000); // Replace with your server IP and port
+        Connect("127.0.0.1", 300); // Replace with your server IP and port
 
         objectData.sendObjectData();
+        objectData.SendMotorData();
+        
+        //started = true;
     }
 
     private void Update()
     {
-
+        if (started)
+        {
+            SendMessage(x++.ToString());
+            Delayed(200);
+        }
     }
 
     void Connect(string server, int port)
@@ -62,7 +71,7 @@ public class MySender : MonoBehaviour
         }
     }
 
-    void SendMessage(string message)  // sends messages to python
+    public void SendMessage(string message)  // sends messages to python
     {
         if (stream != null)
         {
@@ -72,16 +81,6 @@ public class MySender : MonoBehaviour
         }
     }
 
-    // receives data about gameObjects from ObjectData script
-    public void ReceiveData(string url, Vector3 position, Quaternion orientation)
-    {
-        // Process the received data
-        Debug.Log(url + " " + position.ToString() + " " + orientation.ToString());
-
-        SendMessage(url + " " + position.ToString() + " " + orientation.ToString());
-
-        Debug.Log("e7m");
-    }
 
     void OnApplicationQuit()
     {
@@ -91,7 +90,6 @@ public class MySender : MonoBehaviour
 
     async Task Delayed(int milli)
     {
-        await Task.Delay(milli); // Wait for 2000 milliseconds (2 seconds)
-        Debug.Log("Async function executed after 2 seconds");
+        await Task.Delay(milli);
     }
 }

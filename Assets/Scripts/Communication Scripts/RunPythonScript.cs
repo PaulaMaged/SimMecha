@@ -2,19 +2,20 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Unity.Robotics.UrdfImporter;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 public class RunPythonScript : MonoBehaviour
 {
     // Path to the Python script relative to the Unity project folder
-    private string pythonScriptPath = "Assets/Python/main.py";
+    private string pythonScriptPath = "Assets/Python Code/main.py";
 
     // Path to the Python executable
     private string pythonExePath = null;
 
     // Path to the log file
-    private string logFilePath = "Assets/Python/log.txt";
+    private string logFilePath = "Assets/Python Code/log.txt";
 
     public void RunPython()
     {
@@ -54,16 +55,37 @@ public class RunPythonScript : MonoBehaviour
             StartInfo = startInfo
         };
 
+        // Set up event handlers to capture output and error
+        /*
+        process.OutputDataReceived += (sender, args) => {
+            if (args.Data != null)
+            {
+                Log(args.Data);
+            }
+        };
+
+        process.ErrorDataReceived += (sender, args) => {
+            if (args.Data != null)
+            {
+                LogError(args.Data);
+            }
+        };
+        */
+
         try
         {
             process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
             Log("Python process started asynchronously.");
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             LogError("Failed to start Python process: " + ex.Message);
         }
-    }
+    }  
+    
+
 
     private string FindPythonExecutable()
     {
@@ -100,7 +122,7 @@ public class RunPythonScript : MonoBehaviour
                 string fullPath = Path.Combine(dir, "python.exe");
                 if (File.Exists(fullPath))
                 {
-                    Debug.Log("Found path in environment variables: " +  fullPath);
+                    Debug.Log("Found path in environment variables: " + fullPath);
                     return fullPath;
                 }
             }
@@ -120,4 +142,6 @@ public class RunPythonScript : MonoBehaviour
         Debug.LogError(message);
         File.AppendAllText(logFilePath, "ERROR: " + message + "\n");
     }
+
+     
 }
