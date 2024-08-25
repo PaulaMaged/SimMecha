@@ -15,7 +15,7 @@ public class ShowHierarchyMenu : MonoBehaviour
 
     private List<string> motorList = new List<string>();
     private Dictionary<(int robotId, string linkName), string> LinkMotorSelections = new Dictionary<(int robotId, string linkName), string>();
-
+    // Dictionary((robotId, linkName), Dictionary<string, Object>);
     void Start()
     {
         // Optionally, initialize the panel state or set up event handlers

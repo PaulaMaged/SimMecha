@@ -7,13 +7,17 @@ using RuntimeInspectorNamespace;
 
 public class RobotIdentifier : MonoBehaviour
 {
+    public GameObject robot;
     public int robotId;
+    public string url;
+    public List<string> links;
+    Dictionary<link, motor>
 }
 
 public class RuntimeURDFLoader : MonoBehaviour
 {
     public ImportSettings importSettings;
-    public static List<GameObject> ImportedRobots = new List<GameObject>();
+    public static List<GameObject> ImportedRobots;
     private List<string> urdfFilePaths = new List<string>();
     private int nextRobotId = 1;
     public static Dictionary<int, GameObject> RobotIdToGameObject = new Dictionary<int, GameObject>();
