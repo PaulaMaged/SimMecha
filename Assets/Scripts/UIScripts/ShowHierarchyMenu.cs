@@ -1,4 +1,4 @@
-using System;
+// using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro; // For TextMesh Pro
@@ -14,8 +14,14 @@ public class ShowHierarchyMenu : MonoBehaviour
     public GameObject hierarchyPanel; // Assign the hierarchy panel GameObject here
 
     private List<string> motorList = new List<string>();
-    private Dictionary<(int robotId, string linkName), string> LinkMotorSelections = new Dictionary<(int robotId, string linkName), string>();
+    private static Dictionary<(int robotId, string linkName), Dictionary<string, Object>> LinkMotorSelections = new Dictionary<(int robotId, string linkName), Dictionary<string, Object>>();
     // Dictionary((robotId, linkName), Dictionary<string, Object>);
+
+    public static List<string> motorNames;
+    public static List<int> robotId;
+    public static List<string> linkNames;
+    public static List<Dictionary<string, Object>> motorParameters;
+    
     void Start()
     {
         // Optionally, initialize the panel state or set up event handlers
@@ -295,6 +301,21 @@ public class ShowHierarchyMenu : MonoBehaviour
         {
             hierarchyPanel.SetActive(true);
             PopulateHierarchy();
+        }
+    }
+
+    public static void PopulateFinalLists()
+    {
+        foreach (var parentKey in LinkMotorSelections.Keys)
+        {
+            robotId.Add(parentKey.robotId);
+            linkNames.Add(parentKey.linkName);
+            
+            Dictionary<string, Object> currentMotorParam = LinkMotorSelections[parentKey];
+            
+            if (currentMotorParam["motorName"]) motorNames.Add(currentMotorParam["motorName"].ToString());
+            currentMotorParam.Remove("motorName");
+            motorParameters.Add(currentMotorParam);
         }
     }
 }

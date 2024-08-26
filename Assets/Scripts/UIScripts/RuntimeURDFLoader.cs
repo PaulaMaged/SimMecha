@@ -34,7 +34,7 @@ public class RuntimeURDFLoader : MonoBehaviour
     public static List<GameObject> ImportedRobots;
     public static List<RobotModel> NewImportedRobots;
     private List<string> urdfFilePaths = new List<string>();
-    private int nextRobotId = 1;
+    private int nextRobotId = 0;
     public static Dictionary<int, GameObject> RobotIdToGameObject = new Dictionary<int, GameObject>();
 
     public GameObject axisSelectionPanel;
