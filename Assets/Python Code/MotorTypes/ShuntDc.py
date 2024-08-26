@@ -4,7 +4,7 @@ from gym_electric_motor.reference_generators import LaplaceProcessReferenceGener
 
 state_variables = ['omega', 'torque', 'i', 'u', 'u_sup']
 
-def env():
+def env(motor_parameters, i):
     # Select a different converter with default parameters by passing a keystring
     my_overridden_converter = 'Cont-2QC'
 
@@ -20,6 +20,9 @@ def env():
         'j_rotor': 0.025  # Moment of inertia of the rotor (kg·m²)
     }
 
+    if len(motor_parameters) > i and motor_parameters[i] is not None:
+        motor_params = motor_parameters[i]
+
     motor = dict(motor_parameter=motor_params)
 
     env = gem.make(
@@ -32,4 +35,4 @@ def env():
     return env
 
 def action(step):
-    return [1]
+    return [12/60]

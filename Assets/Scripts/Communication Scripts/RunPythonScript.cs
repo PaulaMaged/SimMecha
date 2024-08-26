@@ -56,7 +56,6 @@ public class RunPythonScript : MonoBehaviour
         };
 
         // Set up event handlers to capture output and error
-        /*
         process.OutputDataReceived += (sender, args) => {
             if (args.Data != null)
             {
@@ -70,7 +69,6 @@ public class RunPythonScript : MonoBehaviour
                 LogError(args.Data);
             }
         };
-        */
 
         try
         {

@@ -8,7 +8,7 @@ state_variables = [
 'i_rd', 'i_rq', 'u_ra', 'u_rb', 'u_rc', 'u_rd', 'u_rq', 'epsilon', 'u_sup'
 ]
 
-def env():
+def env(motor_parameters, i):
     # Select a different ode_solver with default parameters by passing a keystring
     my_overridden_solver = 'scipy.solve_ivp'
 
@@ -24,6 +24,9 @@ def env():
         'p': 2,  # Pole pair number
         'j_rotor': 13.695e-4  # Moment of inertia of the rotor (kg·m²)
     }
+
+    if len(motor_parameters) > i and motor_parameters[i] is not None:
+        motor_params = motor_parameters[i]
 
     motor = dict(motor_parameter=motor_params)
 

@@ -28,12 +28,13 @@ def convert_link_names(links_received):
 
 def init():
     global robot_id, correspond_robot_num, correspond_joint_num, physicsClient, link_names
-    while "\n" not in TCP.starting_message:
+    while len(TCP.messages) == 0:
         continue
+    time.sleep(1)
     TCP.split_message()
     TCP.starting_flag = False
 
-    urls, positions, orientations, scalings = TCP.parse_robot_message(TCP.messages[0])
+    urls, positions, orientations, scalings = TCP.parse_robot_message(TCP.messages)
 
     physicsClient = b.connect_to_pybullet()
     plane_id = b.load_environment()
@@ -43,10 +44,10 @@ def init():
         robot_id.append(b.load_robot(urls[i], positions[i], orientations[i], scalings[i] * 3))
         link_names.append(b.get_joint_names(robot_id[i]))
         b.create_joint_constraint(robot_id[i], -1, plane_id, -1, p.JOINT_FIXED, 0)
-        for j in range(p.getNumJoints(robot_id[i])):
-            b.lock_link(robot_id[i], j, 1000)
+        #for j in range(p.getNumJoints(robot_id[i])):
+            #b.lock_link(robot_id[i], j, 1000)
 
-    mot.motorNames, correspond_robot_num, links_received, mot.motor_params = TCP.parse_motor_message(TCP.messages[1])
+    mot.motorNames, correspond_robot_num, links_received, mot.motor_params = TCP.parse_motor_message(TCP.messages)
     convert_link_names(links_received)
 
     mot.motor_process = True
@@ -58,7 +59,7 @@ def update():
     for i in range(len(mot.motorClasses)):
         robot = robot_id[correspond_robot_num[i]]
         b.set_joint_speed(robot, correspond_joint_num[i], mot.omega[i], mot.torque[i])
-        b.unlock_link(robot, correspond_joint_num[i])
+        #b.unlock_link(robot, correspond_joint_num[i])
         p.stepSimulation()
         time.sleep(1. / 240.)
 

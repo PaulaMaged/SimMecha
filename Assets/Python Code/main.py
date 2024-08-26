@@ -21,18 +21,15 @@ def main():
     # Create and start processes
     bullet_thread = threading.Thread(target=bullet)
     motor_thread = threading.Thread(target=motor)
-    plot_thread = threading.Thread(target=graph.plot)
     tcp_thread = threading.Thread(target=TCP.start_server)
 
     bullet_thread.start()
     motor_thread.start()
-    plot_thread.start()
     tcp_thread.start()
 
     # Join processes to ensure they complete
     bullet_thread.join()
     motor_thread.join()
-    plot_thread.join()
     #tcp_thread.join()
 
 

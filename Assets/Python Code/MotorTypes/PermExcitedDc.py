@@ -6,7 +6,7 @@ from gym_electric_motor.physical_systems import DcMotorSystem, DcPermanentlyExci
 
 state_variables = ['omega', 'torque', 'i', 'u', 'u_sup']
 
-def env():
+def env(motor_parameters, i):
     # Select a different converter with default parameters by passing a keystring
     my_overridden_converter = 'Cont-2QC'
 
@@ -20,10 +20,13 @@ def env():
     )
 
     motor_params = {
-        'r_a': 2.0,  # Armature resistance (Ohm)
-        'l_a': 1.0e-3,  # Armature inductance (Henry)
-        'j_rotor': 0.02,  # Rotor inertia (kg·m²)
+        'r_a': 1.5,  # Armature resistance (Ohm)
+        'l_a': 0.8e-3,  # Armature inductance (Henry)
+        'j_rotor': 0.015,  # Rotor inertia (kg·m²)
     }
+
+    if len(motor_parameters) > i and motor_parameters[i] is not None:
+        motor_params = motor_parameters[i]
 
     motor = dict(motor_parameter=motor_params)
 
@@ -37,4 +40,4 @@ def env():
     return env
 
 def action(step):
-    return [1]
+    return [12/60]

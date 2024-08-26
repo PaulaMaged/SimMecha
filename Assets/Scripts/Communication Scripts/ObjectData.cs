@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Text;
 using System;
+using System.Threading.Tasks;
+using UnityEditor.Experimental.GraphView;
 
 public class JsonSerializer
 {
@@ -103,7 +105,7 @@ public class ObjectData : MonoBehaviour
     private List<int> robotNums;
     private List<string> linkNames;
     private List<Dictionary<string, object>> motorParamsList;
-    public void sendObjectData()
+    public void sendRobotData()
     {
         urdfLoader = urdfLoaderGameObject.GetComponent<RuntimeURDFLoader>();
 
@@ -123,43 +125,54 @@ public class ObjectData : MonoBehaviour
             float scaling = (transform.localScale.x + transform.localScale.y + transform.localScale.z)/3;
 
             string message = urls[i] + ",, " + pos.ToString() + ",, " + orientation.ToString() + ",, " + scaling.ToString();
-            MySender.Instance.SendMessage(message);
+            MySender.Instance.SendMessage("\n" + message);
         }
     }
 
-    public void SendMotorData()  //not yet implemented
+    public async void SendMotorData()  //not yet implemented
     {
-        motorNames = new List<string> { "PermMagnetSynch", "PermMagnetSynch" };
-        robotNums = new List<int> { 0, 0 };
-        linkNames = new List<string> { "panda_link1", "panda_link4" };
+        motorNames = new List<string> { "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc", 
+            "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc"};
+        robotNums = new List<int> { 0, 0, 0, 0, 0, 0, 0, 0 };
+        linkNames = new List<string> { "panda_link1", "panda_link2", "panda_link3", "panda_link4",
+        "panda_link5", "panda_link6", "panda_link7", "panda_link8" };
+
         motorParamsList = new List<Dictionary<string, object>>();
 
-        motorParamsList.Add(new Dictionary<string, object>
+        for (int i = 0; i < 8; i++)
         {
-            { "r_s", 18e-2 },  // Stator resistance
-            { "l_d", 0.37e-2 },  // Direct axis inductance
-            { "l_q", 1.2e-2 },  // Quadrature axis inductance
-            { "p", 3 },  // Pole pair number
-            { "j_rotor", 0.03883 }  // Rotor moment of inertia
-        });
+            motorParamsList.Add(new Dictionary<string, object>
+            {
+                { "r_a", 1.0 },
+                { "r_e", 1.0 },
+                { "l_a", 19e-6 },
+                { "l_e", 5.4e-3 },
+                { "l_e_prime", 1.7e-3 },
+                { "j_rotor", 0.025 }
+            });
+        }
 
-        // Add another dictionary dynamically
-        motorParamsList.Add(new Dictionary<string, object>
+        for (int i = 0; i < motorNames.Count; i++)
         {
-            { "r_s", 20e-2 },
-            { "l_d", 0.4e-2 },
-            { "l_q", 1.5e-2 },
-            { "p", 4 },
-            { "j_rotor", 0.040 }
-        });
+            // Get the corresponding motor data for index i
+            string motor = motorNames[i];
+            string robot = robotNums[i].ToString();
+            string link = linkNames[i];
+            string motorParam = JsonSerializer.SerializeToCustomFormat(new List<Dictionary<string, object>> { motorParamsList[i] });
 
-        string motors = string.Join(", ", motorNames);
-        string robots = string.Join(", ", robotNums);
-        string links = string.Join(", ", linkNames);
-        string motorParams = JsonSerializer.SerializeToCustomFormat(motorParamsList);
+            // Create the message with individual motor details
+            string message = $"({motor}, {robot}, {link}, {motorParam})";
 
-        string message = $"({motors}), ({robots}), ({links}), ({motorParams})";
-        MySender.Instance.SendMessage("\n" + message);
+            // Send the message for this motor
+            MySender.Instance.SendMessage("\n" + message);
+            await Task.Delay(20);
+        }
+
+    }
+
+    async Task Delayed(int milli)
+    {
+        await Task.Delay(milli);
     }
 
 }

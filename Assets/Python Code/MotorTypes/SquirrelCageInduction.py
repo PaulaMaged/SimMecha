@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 state_variables = ['omega', 'torque', 'i_sd', 'i_sq', 'i_a', 'i_b', 'i_c', 'u_sd', 'u_sq', 'u_a', 'u_b', 'u_c', 'u_sup']
 
-def env():
+def env(motor_parameters, i):
     # Select a different ode_solver with default parameters by passing a keystring
     my_overridden_solver = 'scipy.solve_ivp'
 
@@ -21,6 +21,9 @@ def env():
         'p': 2,  # Pole pair number
         'j_rotor': 0.0011  # Moment of inertia of the rotor (kg·m²)
     }
+
+    if len(motor_parameters) > i and motor_parameters[i] is not None:
+        motor_params = motor_parameters[i]
 
     motor = dict(motor_parameter=motor_params)
 

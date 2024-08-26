@@ -4,8 +4,8 @@ import time
 
 import matplotlib.pyplot as plt
 
+
 show_graph = False
-flag_lock = threading.Lock()
 
 # Initialize plotting function
 def init_plotting(state_variables, window_title):
@@ -67,7 +67,7 @@ def plot():
     global show_graph
     while True:
         if show_graph:
-            plt.show()
+            MotorMain.plt.show()
             show_graph = False
         time.sleep(1000)
 

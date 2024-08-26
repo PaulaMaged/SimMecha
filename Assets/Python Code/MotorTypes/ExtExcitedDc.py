@@ -5,7 +5,8 @@ from gym_electric_motor.reference_generators import LaplaceProcessReferenceGener
 
 state_variables = ['omega', 'torque', 'i_a', 'i_e', 'u_a', 'u_e', 'u_sup']
 
-def env():
+
+def env(motor_parameters, i):
 
     # Select a different ode_solver with default parameters by passing a keystring
     my_overridden_solver = 'scipy.solve_ivp'
@@ -28,6 +29,9 @@ def env():
         'j_rotor': 0.025  # Moment of inertia of the rotor (kg·m²)
     }
 
+    if len(motor_parameters) > i and motor_parameters[i] is not None:
+        motor_params = motor_parameters[i]
+
     motor = dict(motor_parameter=motor_params)
 
     env = gem.make(
@@ -40,7 +44,21 @@ def env():
     return env
 
 
+x = 60
+
 # 2 voltages
 def action(step):
-    actions = [1,1]
+    global x
+
+    # First 1000 steps positive
+    if step < 1000:
+        x = 60
+    else:
+        # After 1000 steps, toggle sign every 2000 steps
+        if ((step - 1000) // 2000) % 2 == 0:
+            x = -60  # Negative for these 2000 steps
+        else:
+            x = 60   # Positive for the next 2000 steps
+
+    actions = [x / 60, 60 / 60]
     return actions

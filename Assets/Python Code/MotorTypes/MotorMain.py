@@ -31,15 +31,13 @@ def init():
         motor = globals()[class_name]
         motorClasses.append(motor)
 
-        env.append(motor.env(motor_params[i]))
+        env.append(motor.env(motor_params, i))
 
         state_variables.append(motor.state_variables)
         env_limits.append(env[i].limits)
         all_states.append([])
 
         init_graphs(i, f'{i+1} - {motorName}')
-
-
 
 
 def update():
@@ -59,9 +57,8 @@ def update():
         torque[i] = real_state[1]
         # Print state variables
         state_values = ", ".join(f"{name}: {value}" for name, value in zip(state_variables[i], real_state))
-        print(f"Motor {i}, Step {step}: {state_values}")
-        all_states[i].append(real_state)
-        update_graphs(i, 1000)
+        print(f"Motor {i+1}, Step {step}: {state_values}")
+        update_graphs(i, 5000, real_state)
 
 
 def init_graphs(i, motorName):
@@ -72,7 +69,9 @@ def init_graphs(i, motorName):
     data_dict.append(data)
     steps.append(st)
 
-def update_graphs(i, max_step):
+def update_graphs(i, max_step, real_state):
+    if step <= max_step:
+        all_states[i].append(real_state)
     if step == max_step:
         GraphPlot.plot_all_data(fig[i], axes[i], state_variables[i], all_states[i])
         if i == len(motorClasses) - 1:

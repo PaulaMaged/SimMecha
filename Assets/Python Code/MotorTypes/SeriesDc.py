@@ -5,7 +5,7 @@ from gym_electric_motor.reference_generators import LaplaceProcessReferenceGener
 
 state_variables = ['omega', 'torque', 'i', 'u', 'u_sup']
 
-def env():
+def env(motor_parameters, i):
     # Select a different converter with default parameters by passing a keystring
     my_overridden_converter = 'Finite-2QC'
 
@@ -21,6 +21,9 @@ def env():
         'l_e_prime': 1.7e-3,  # Effective excitation inductance (Henry)
         'j_rotor': 0.025  # Moment of inertia of the rotor (kg·m²)
     }
+
+    if motor_parameters[i] is not None:
+        motor_params = motor_parameters[i]
 
     motor = dict(motor_parameter=motor_params)
 

@@ -8,8 +8,9 @@ starting_message = ""
 curr_message = ""
 messages = []
 starting_flag = True
+
 # handles communication between unity and python
-def start_server(host="127.0.0.1", port=300):
+def start_server(host="127.0.0.1", port=301):
     global starting_message, curr_message
     with sock as s:
         #This line sets the SO_REUSEADDR option on the socket,
@@ -26,54 +27,79 @@ def start_server(host="127.0.0.1", port=300):
                 if not data:
                     break
                 curr_message = data.decode()
-                if starting_flag:
-                    starting_message += curr_message
-
-                print(f"starting message: {starting_message}")
+                messages.append(curr_message)
                 print(f"current message: {curr_message}")
+                #split_message()
 
 
 def split_message():
     global messages
-    # Split the message by '\n' into as many parts as there are occurrences of '\n'
-    messages = starting_message.split('\n')
+    i = 0
+    while i < len(messages):
+        # Check if there's a '\n' in the current message
+        while '\n' in messages[i]:
+            # Split the message at the first occurrence of '\n'
+            split_parts = messages[i].split('\n', 1)  # Split into exactly 2 parts
 
-    # Print or return the parts as an array of strings
+            # Update the current message to the first part
+            messages[i] = split_parts[0]
+
+            # Insert the second part in the next index, and shift the rest
+            messages.insert(i + 1, split_parts[1])
+
+        # Move to the next message
+        i += 1
+
+    for msg in messages:
+        if msg == '':
+            messages.remove(msg)
+
     print(f"Number of Parts: {len(messages)}")
-    print("Split Parts:", messages)
+    print("Split Parts:")
+
+    max_length = max(len(msg) for msg in messages)
+    for msg in messages:
+        print(f"{msg.ljust(max_length)}")
 
 
-def parse_robot_message(message):
-    # Regular expressions to find numbers in the message
+def parse_robot_message(messages):
+    # Regular expressions to find numbers and patterns in the message
     url_pattern = r'[A-Za-z]:\\(?:[\w\s]+\\)*[\w\s]+\.[\w]+'
-    position_pattern = r'\(([\d\.\-]+), ([\d\.\-]+), ([\d\.\-]+)\)'
-    orientation_pattern = r'\(([\d\.\-]+), ([\d\.\-]+), ([\d\.\-]+), ([\d\.\-]+)\)'
-    scaling_pattern = r',,\s*([\d\.\-]+)'  # Pattern to match the last number (scaling value, can be float)
+    position_pattern = r'\(([\d\.\-]+),\s*([\d\.\-]+),\s*([\d\.\-]+)\)'
+    orientation_pattern = r'\(([\d\.\-]+),\s*([\d\.\-]+),\s*([\d\.\-]+),\s*([\d\.\-]+)\)'
+    scaling_pattern = r',\s*([\d\.\-]+)\s*$'  # Pattern to match the last number (scaling value, can be float)
 
-    # Find all matches for url, position, orientation, and scaling
-    url_matches = re.findall(url_pattern, message)
-    position_matches = re.findall(position_pattern, message)
-    orientation_matches = re.findall(orientation_pattern, message)
-    scaling_matches = re.findall(scaling_pattern, message)
-
+    # Initialize lists to hold the parsed data
     urls = []
     positions = []
     orientations = []
     scalings = []
 
-    # Convert matched strings to appropriate types and store them in lists
-    for match in url_matches:
-        urls.append(match)
+    i = 0
+    while i < len(messages):
+        line = messages[i]
 
-    for match in position_matches:
-        positions.append([float(num) for num in match])
+        # Check if the line matches the expected format
+        if re.search(url_pattern, line) or re.search(position_pattern, line) or re.search(orientation_pattern, line):
+            # Extract matches for each pattern
+            url_matches = re.findall(url_pattern, line)
+            position_matches = re.findall(position_pattern, line)
+            orientation_matches = re.findall(orientation_pattern, line)
+            scaling_matches = re.findall(scaling_pattern, line)
 
-    for match in orientation_matches:
-        orientations.append([float(num) for num in match])
+            # Convert matched strings to appropriate types and store them in lists
+            urls.extend(url_matches)
+            positions.extend([list(map(float, match)) for match in position_matches])
+            orientations.extend([list(map(float, match)) for match in orientation_matches])
+            scalings.extend([float(match) for match in scaling_matches])
 
-    for match in scaling_matches:
-        scalings.append(float(match))  # Convert scaling value to float
+            # Remove the processed line from the messages list
+            del messages[i]
+        else:
+            # Move to the next line if the current one does not match the expected format
+            i += 1
 
+    # Print or return the parsed data
     print("Urls:", urls)
     print("Positions:", positions)
     print("Orientations:", orientations)
@@ -82,36 +108,53 @@ def parse_robot_message(message):
     return urls, positions, orientations, scalings
 
 
-def parse_motor_message(message):
-    # Regular expression for extracting arrays inside parentheses
-    array_pattern = r'\(([^)]+)\)'  # Matches anything inside parentheses
+def parse_motor_message(messages):
+    # Define regular expressions for each component
+    motor_name_pattern = r'^\((\w+)'  # Matches motor name at the start of the line
+    robot_num_pattern = r',\s*(\d+)'  # Matches robot number after a comma
+    link_pattern = r',\s*(\w+_link\d+)'  # Matches link names like panda_link1
+    params_pattern = r'\{(.+)\}'  # Matches the dictionary of motor parameters
 
-    # Find all arrays in the message
-    matches = re.findall(array_pattern, message)
-
+    # Initialize lists to hold the parsed data
     motorNames = []
     correspond_robot_num = []
     correspond_links = []
     motor_params = []
 
-    if len(matches) == 4:  # Now expecting 4 arrays in the message
-        # Extract and split the elements from each matched array
-        motorNames = [name.strip() for name in matches[0].split(',')]
-        correspond_robot_num = [int(num.strip()) for num in matches[1].split(',')]
-        correspond_links = [link.strip() for link in matches[2].split(',')]
+    i = 0
+    while i < len(messages):
+        line = messages[i]
 
-        # Parse the motor parameters from the dictionary-like string
-        motor_params_str = matches[3].split('},')
-        for param_str in motor_params_str:
-            # Make sure to re-add the closing brace '}' if it's been split off
-            if '}' not in param_str:
-                param_str = param_str + '}'
+        # Extract motor name
+        motor_name_match = re.search(motor_name_pattern, line)
+        robot_num_match = re.search(robot_num_pattern, line)
+        link_match = re.search(link_pattern, line)
+        params_match = re.search(params_pattern, line)
 
-            # Use ast.literal_eval to safely evaluate the dictionary string
-            param_dict = ast.literal_eval(param_str.strip())
-            motor_params.append(param_dict)
+        if motor_name_match and robot_num_match and link_match and params_match:
+            # Store the extracted data
+            motorNames.append(motor_name_match.group(1))
+            correspond_robot_num.append(int(robot_num_match.group(1)))
+            correspond_links.append(link_match.group(1))
 
-    # Print or return the parsed data
+            # Parse motor parameters as a dictionary
+            param_str = '{' + params_match.group(1) + '}'
+            try:
+                param_dict = ast.literal_eval(param_str)
+                motor_params.append(param_dict)
+            except (ValueError, SyntaxError) as e:
+                print(f"Error parsing motor parameters: {e}")
+                # Skip this message if parsing fails, move to the next line
+                i += 1
+                continue
+
+            # Remove the processed line from the messages list
+            del messages[i]
+        else:
+            # Move to the next line if the current one does not match the expected format
+            i += 1
+
+    # Print final parsed results
     print("Motor Names:", motorNames)
     print("Corresponding Robot Numbers:", correspond_robot_num)
     print("Corresponding Links:", correspond_links)
@@ -121,6 +164,14 @@ def parse_motor_message(message):
 
 
 if __name__ == '__main__':
-    # Modify the message to use a single comma to separate arrays
-    message = "(PermMagnetSynch, PermMagnetSynch), (0,0), (panda_link1, panda_link2), ({'r_s': 18e-2, 'l_d': 0.37e-2, 'l_q': 1.2e-2, 'p': 3, 'j_rotor': 0.03883}, {'r_s': 20e-2, 'l_d': 0.4e-2, 'l_q': 1.5e-2, 'p': 4, 'j_rotor': 0.040})"
-    parse_motor_message(message)
+    messages = [
+        "C:\\Users\\Ayman Tarek\\Desktop\\pubullet_data\\pybullet_data\\franka_panda\\panda.urdf, (0.00, 5.00, 0.00), (0.00000, 0.00000, 0.00000, 1.00000), 1",
+        "C:\\Users\\Ayman Tarek\\Desktop\\pubullet_data\\pybullet_data\\franka_panda\\panda.urdf, (0.00, 5.00, 0.00), (0.00000, 0.00000, 0.00000, 1.00000), 1",
+        "(ExtExcitedDc, 0, panda_link1, {'r_a': 1, 'r_e': 1, 'l_a': 1.9000000000000001E-05, 'l_e': 0.0054000000000000003, 'l_e_prime': 0.0016999999999999999, 'j_rotor': 0.025000000000000001})",
+        "(ExtExcitedDc, 0, panda_link2, {'r_a': 1, 'r_e': 1, 'l_a': 1.9000000000000001E-05, 'l_e': 0.0054000000000000003, 'l_e_prime': 0.0016999999999999999, 'j_rotor': 0.025000000000000001})",
+        # Additional lines...
+    ]
+
+    parse_robot_message(messages)
+    print(messages)
+    parse_motor_message(messages)

@@ -9,7 +9,7 @@ from MotorTypes import MotorMain as mot
 
 state_variables = ['omega', 'torque', 'i_sd', 'i_sq', 'i_a', 'i_b', 'i_c', 'u_sd', 'u_sq', 'u_a', 'u_b', 'u_c', 'u_sup']
 
-def env(motor_params):
+def env(motor_parameters, i):
     # Select a different ode_solver with default parameters by passing a keystring
     my_overridden_solver = 'scipy.solve_ivp'
 
@@ -17,6 +17,17 @@ def env(motor_params):
     my_changed_voltage_supply_args = {'u_nominal': 400}
 
     voltage = gym_electric_motor.physical_systems.voltage_supplies.IdealVoltageSupply(u_nominal=600.0)
+
+    motor_params = {
+        'r_s': 18e-2,  # Stator resistance (Ohm)
+        'l_d': 0.37e-2,  # Direct axis inductance (Henry)
+        'l_q': 1.2e-2,  # Quadrature axis inductance (Henry)
+        'p': 3,  # Pole pair number
+        'j_rotor': 0.03883  # Moment of inertia of the rotor (kg·m²)
+    }
+
+    if motor_parameters[i] is not None:
+        motor_params = motor_parameters[i]
 
     motor = dict(motor_parameter=motor_params)
 
