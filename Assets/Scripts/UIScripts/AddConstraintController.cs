@@ -26,31 +26,23 @@ namespace UIScripts
 
         private Dictionary<int, List<string>> selectedLinksByRobot = new Dictionary<int, List<string>>();
         // Dictionary<(Robot1.Link2, Robot2.Link3), constraint>;
-        private Dictionary<((int robotId, int linkNumber), (int robotId, int linkNumber)), string> _linkConstraints;
+        private Dictionary<((int robotId, string link), (int robotId, string link)), string> _linkConstraints;
 
         private void Awake()
         {
             _toggleButton.onClick.AddListener(OnToggleButtonClick);
-            _toggleButton.onClick.AddListener(OnConfirmButtonClick);
+            _confirmButton.onClick.AddListener(OnConfirmButtonClick);
         }
 
         void Start()
         {
-            _linkConstraints = new Dictionary<((int robotId, int linkNumber), (int robotId, int linkNumber)), string>();
+            _linkConstraints = new Dictionary<((int robotId, string link), (int robotId, string link)), string>();
 
             robotDropdowns = _robotDropdowns.GetComponentsInChildren<TMP_Dropdown>();
             linkDropdowns = _linkDropdowns.GetComponentsInChildren<TMP_Dropdown>();
             constraintDropdown = _constraintDropdowns.GetComponent<TMP_Dropdown>();
 
             _constraintPanel.SetActive(false);
-
-            // Register selection events
-            for (int i = 0; i < robotDropdowns.Length; i++)
-            {
-                int index = i; // Capture the index for the lambda
-                robotDropdowns[i].onValueChanged.AddListener(delegate { OnRobotDropdownChanged(robotDropdowns[index], index); });
-                linkDropdowns[i].onValueChanged.AddListener(delegate { OnLinkDropdownChanged(linkDropdowns[index], index); });
-            }
 
             List<string> constraintOptions = new List<string>
             {
@@ -59,34 +51,46 @@ namespace UIScripts
                 "Constraint 3"
             };
 
+            constraintDropdown.ClearOptions();
             constraintDropdown.AddOptions(constraintOptions);
+            
+            PopulateConstraintPanel();
         }
 
         private void PopulateConstraintPanel()
         {
             robots.Clear();
-            links.Clear();
             selectedLinksByRobot.Clear();
 
+            int counter = 0;
+            
             foreach (GameObject robot in RuntimeURDFLoader.ImportedRobots)
             {
                 robots.Add(new TMP_Dropdown.OptionData(robot.name));
                 selectedLinksByRobot[robots.Count - 1] = new List<string>();
+                
+                links.Clear();
 
-                foreach (Transform link in robot.transform)
-                {
-                    AddLinksToLinkMenu(links, link);
-                }
+                AddLinksToLinkMenu(links, robot.transform);
+                
+                linkDropdowns[counter].options.Clear();
+                linkDropdowns[counter].AddOptions(links);
+
+                counter++;
             }
 
-            foreach (var dropdown in robotDropdowns)
+            foreach (var robotDropdown in robotDropdowns)
             {
-                dropdown.options = robots;
+                robotDropdown.options.Clear();
+                robotDropdown.AddOptions(robots);
             }
-
-            foreach (var dropdown in linkDropdowns)
+            
+            // Register selection events
+            for (int i = 0; i < robotDropdowns.Length; i++)
             {
-                dropdown.options = links;
+                int index = i; // Capture the index for the lambda
+                robotDropdowns[i].onValueChanged.AddListener(delegate { OnRobotDropdownChanged(robotDropdowns[index], index); });
+                linkDropdowns[i].onValueChanged.AddListener(delegate { OnLinkDropdownChanged(linkDropdowns[index], index); });
             }
         }
 
@@ -150,11 +154,16 @@ namespace UIScripts
 
             // Add to the _linkConstraints dictionary
             _linkConstraints.Add(
-                ((firstRobotIndex, firstLinkIndex), (secondRobotIndex, secondLinkIndex)),
+                ((RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex]), 
+                (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
                 constraint
             );
 
-            Debug.Log("Constraint added successfully!");
+            Debug.Log("Constraint added successfully!\n" +
+                      $"Id1: { RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId } -- Link1: { RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex] }" +
+                      $"Id2: { RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId } -- Link1: { RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex] }" +
+                      $"Constraint: { constraint }"
+                );
         }
     }
 }

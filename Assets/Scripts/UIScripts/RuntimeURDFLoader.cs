@@ -1,23 +1,38 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Robotics.UrdfImporter;
 using SFB; // StandaloneFileBrowser namespace
 using System.Collections.Generic;
 using RuntimeInspectorNamespace;
+using TMPro;
 
 public class RobotIdentifier : MonoBehaviour
 {
-    public GameObject robot;
     public int robotId;
-    public string url;
-    public List<string> links;
-    Dictionary<link, motor>
+}
+public class RobotModel
+{
+    public GameObject Robot;
+    public int RobotId;
+    public string URL;
+    public List<string> Links;
+    // Dictionary<string, MotorBase>;
+
+    public RobotModel(GameObject robot, int robotId, string url, List<string> links)
+    {
+        this.Robot = robot;
+        this.RobotId = robotId;
+        this.URL = url;
+        this.Links = links;
+    }
 }
 
 public class RuntimeURDFLoader : MonoBehaviour
 {
     public ImportSettings importSettings;
     public static List<GameObject> ImportedRobots;
+    public static List<RobotModel> NewImportedRobots;
     private List<string> urdfFilePaths = new List<string>();
     private int nextRobotId = 1;
     public static Dictionary<int, GameObject> RobotIdToGameObject = new Dictionary<int, GameObject>();
@@ -32,6 +47,13 @@ public class RuntimeURDFLoader : MonoBehaviour
 
     public RuntimeHierarchy runtimeHierarchy;
 
+    private void Awake()
+    {
+        ImportedRobots = new List<GameObject>();
+        NewImportedRobots = new List<RobotModel>();
+        RobotIdToGameObject = new Dictionary<int, GameObject>();
+    }
+
     void Start()
     {
         RuntimeUrdf.SetRuntimeMode(true);
@@ -45,9 +67,6 @@ public class RuntimeURDFLoader : MonoBehaviour
                 linksLoaded = 0
             };
         }
-
-        ImportedRobots = new List<GameObject>();
-        RobotIdToGameObject = new Dictionary<int, GameObject>();
 
         yAxisButton.onClick.AddListener(() => OnAxisSelected(ImportSettings.axisType.yAxis));
         zAxisButton.onClick.AddListener(() => OnAxisSelected(ImportSettings.axisType.zAxis));
@@ -103,6 +122,11 @@ public class RuntimeURDFLoader : MonoBehaviour
                 RobotIdToGameObject[identifier.robotId] = robot;
                 ImportedRobots.Add(robot);
 
+                List<string> robotLinks = new List<string>();
+                GetLinksFromRobot(robotLinks, robot.transform);
+                
+                NewImportedRobots.Add(new RobotModel(robot, identifier.robotId, urdfFilePath, robotLinks));
+
                 DisableArticulationBodies(robot);
 
                 currentImportedRobot = robot;
@@ -148,6 +172,22 @@ public class RuntimeURDFLoader : MonoBehaviour
         else
         {
             Debug.LogWarning("Invalid scale value.");
+        }
+    }
+    
+    private static void GetLinksFromRobot(List<string> links, Transform parent)
+    {
+        // Check if the object has a component named "UrdfLink"
+        if (parent.GetComponent<UrdfLink>() != null)
+        {
+            // Add the link's name to the dropdown options
+            links.Add(parent.name);
+        }
+
+        // Recursively check the children
+        foreach (Transform child in parent)
+        {
+            GetLinksFromRobot(links, child);
         }
     }
 
