@@ -27,6 +27,7 @@ namespace UIScripts
         private Dictionary<int, List<string>> selectedLinksByRobot = new Dictionary<int, List<string>>();
         // Dictionary<(Robot1.Link2, Robot2.Link3), constraint>;
         private Dictionary<((int robotId, string link), (int robotId, string link)), string> _linkConstraints;
+        private static List<string> constraintStrings = new List<string>();
 
         private void Awake()
         {
@@ -64,6 +65,8 @@ namespace UIScripts
 
             int counter = 0;
             
+            robots.Add(new TMP_Dropdown.OptionData("plane"));
+            
             foreach (GameObject robot in RuntimeURDFLoader.ImportedRobots)
             {
                 robots.Add(new TMP_Dropdown.OptionData(robot.name));
@@ -71,7 +74,8 @@ namespace UIScripts
                 
                 links.Clear();
 
-                AddLinksToLinkMenu(links, robot.transform);
+                if(robot.name.Equals("plane")) links.Add(new TMP_Dropdown.OptionData("plane"));
+                else AddLinksToLinkMenu(links, robot.transform);
                 
                 linkDropdowns[counter].options.Clear();
                 linkDropdowns[counter].AddOptions(links);
@@ -152,18 +156,46 @@ namespace UIScripts
 
             string constraint = constraintDropdown.options[constraintDropdown.value].text;
 
-            // Add to the _linkConstraints dictionary
-            _linkConstraints.Add(
-                ((RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex]), 
-                (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
-                constraint
-            );
+            if (firstRobotIndex == 0)
+            {
+                // Add to the _linkConstraints dictionary
+                _linkConstraints.Add(
+                    ((-1, "plane"), 
+                        (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
+                    constraint
+                );
+            } else if (secondRobotIndex == 0)
+            {
+                // Add to the _linkConstraints dictionary
+                _linkConstraints.Add(
+                    ((RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex]),
+                        (-1, "plane")),
+                    constraint
+                );
+            }
+            else
+            {
+                // Add to the _linkConstraints dictionary
+                _linkConstraints.Add(
+                    ((RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex]), 
+                        (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
+                    constraint
+                );
+            }
 
             Debug.Log("Constraint added successfully!\n" +
                       $"Id1: { RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId } -- Link1: { RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex] }" +
                       $"Id2: { RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId } -- Link1: { RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex] }" +
                       $"Constraint: { constraint }"
                 );
+        }
+
+        public void PopulateConstraintStringsList()
+        {
+            foreach (var keyValuePair in _linkConstraints)
+            {
+                constraintStrings.Add($"{keyValuePair.Key.Item1.robotId}, {keyValuePair.Key.Item1.link}, {keyValuePair.Key.Item2.robotId}, {keyValuePair.Key.Item2.link}, {keyValuePair.Value}");
+            }
         }
     }
 }
