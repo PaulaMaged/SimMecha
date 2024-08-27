@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 using System.Threading.Tasks;
+using RuntimeInspectorNamespace;
 
 public class MySender : MonoBehaviour
 {
@@ -84,8 +85,10 @@ public class MySender : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        stream.Close();
-        client.Close();
+        if(!stream.IsNull())
+            stream.Close();
+        if(!client.IsNull())
+            client.Close();
     }
 
     async Task Delayed(int milli)
