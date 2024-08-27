@@ -14,7 +14,7 @@ public class ShowHierarchyMenu : MonoBehaviour
 
     public MotorPopupManager motorPopupManager;
 
-    private List<string> motorList = new List<string> { "DC_Motor", "StepperMotor", "DoublyFedInduction", "ExtExcitedDc", "ExtExcitedSynch", "PermExcitedDc" };
+    private List<string> motorList = new List<string> {"DoublyFedInduction", "ExtExcitedDc", "ExtExcitedSynch", "PermExcitedDc", "SeriesDc", "ShuntDc", "SquirrelCageInduction", "SynchReluctance" };
     private static Dictionary<(int robotId, string linkName), Dictionary<string, object>> LinkMotorSelections = new Dictionary<(int robotId, string linkName), Dictionary<string, object>>();
     // Dictionary((robotId, linkName), Dictionary<string, Object>);
 
@@ -147,10 +147,13 @@ public class ShowHierarchyMenu : MonoBehaviour
             LinkMotorSelections[key] = new Dictionary<string, object>();
         }
 
+        LinkMotorSelections[key]["motorName"] = motorSelection;
+
         Debug.Log($"Stored selection: {robotId} -> {linkSelection} -> {motorSelection}");
 
         motorPopupManager.ShowMotorPopup(robotId, linkSelection, motorSelection, LinkMotorSelections[key]);
     }
+
 
 
 
