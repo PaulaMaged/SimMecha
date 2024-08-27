@@ -32,21 +32,21 @@ public class MySender : MonoBehaviour
         }
     }
 
-    public void StartSimulation()
-    {
-        objectData = obj.GetComponent<ObjectData>();
-        runPythonScript = pythonRun.GetComponent<RunPythonScript>();
+    //public void StartSimulation()
+    //{
+    //    objectData = obj.GetComponent<ObjectData>();
+    //    runPythonScript = pythonRun.GetComponent<RunPythonScript>();
 
-        //runPythonScript.RunPython();
+    //    //runPythonScript.RunPython();
 
-        Debug.Log("Hellooo");
-        Connect("127.0.0.1", 301); // Replace with your server IP and port
+    //    Debug.Log("Hellooo");
+    //    Connect("127.0.0.1", 21042); // Replace with your server IP and port
 
-        objectData.sendRobotData();
-        objectData.SendMotorData();
+    //    objectData.sendRobotData();
+    //    objectData.SendMotorData();
         
-        //started = true;
-    }
+    //    //started = true;
+    //}
 
     private void Update()
     {
