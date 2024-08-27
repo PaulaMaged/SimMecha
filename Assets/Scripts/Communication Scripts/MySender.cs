@@ -39,12 +39,9 @@ public class MySender : MonoBehaviour
 
         //runPythonScript.RunPython();
 
-        Debug.Log("Hellooo");
         Connect("127.0.0.1", 301); // Replace with your server IP and port
 
-        objectData.sendRobotData();
-        objectData.SendMotorData();
-        
+        objectData.SendAllData();
         //started = true;
     }
 

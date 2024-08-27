@@ -9,6 +9,7 @@ using System.Text;
 using System;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
+using UIScripts;
 
 public class JsonSerializer
 {
@@ -96,7 +97,12 @@ public class JsonSerializer
 public class ObjectData : MonoBehaviour
 {
     private RuntimeURDFLoader urdfLoader;
+    private ShowHierarchyMenu showHierarchyMenu;
+    private AddConstraintController addConstraintController;
+
     public GameObject urdfLoaderGameObject;
+    public GameObject showHierarchyMenuGameObject;
+    public GameObject addConstraintControllerGameObject;
 
     private List<GameObject> Robots;
     private List<string> urls;
@@ -105,10 +111,17 @@ public class ObjectData : MonoBehaviour
     private List<int> robotNums;
     private List<string> linkNames;
     private List<Dictionary<string, object>> motorParamsList;
-    public void sendRobotData()
+
+
+    void Awake()
     {
         urdfLoader = urdfLoaderGameObject.GetComponent<RuntimeURDFLoader>();
+        showHierarchyMenu = showHierarchyMenuGameObject.GetComponent<ShowHierarchyMenu>();
+        addConstraintController = addConstraintControllerGameObject.GetComponent<AddConstraintController>();
+    }
 
+    public async void sendRobotData()
+    {
         Robots = urdfLoader.GetImportedRobots();
         urls = urdfLoader.GetUrls();
 
@@ -124,33 +137,20 @@ public class ObjectData : MonoBehaviour
             Quaternion orientation = transform.rotation;
             float scaling = (transform.localScale.x + transform.localScale.y + transform.localScale.z)/3;
 
-            string message = urls[i] + ",, " + pos.ToString() + ",, " + orientation.ToString() + ",, " + scaling.ToString();
+            string message = urls[i] + ", " + pos.ToString() + ", " + orientation.ToString() + ", " + scaling.ToString();
             MySender.Instance.SendMessage("\n" + message);
+            await Task.Delay(20);
         }
     }
 
     public async void SendMotorData()  //not yet implemented
     {
-        motorNames = new List<string> { "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc", 
-            "ExtExcitedDc", "ExtExcitedDc", "ExtExcitedDc"};
-        robotNums = new List<int> { 0, 0, 0, 0, 0, 0, 0, 0 };
-        linkNames = new List<string> { "panda_link1", "panda_link2", "panda_link3", "panda_link4",
-        "panda_link5", "panda_link6", "panda_link7", "panda_link8" };
+        showHierarchyMenu.PopulateHierarchy();
 
-        motorParamsList = new List<Dictionary<string, object>>();
-
-        for (int i = 0; i < 8; i++)
-        {
-            motorParamsList.Add(new Dictionary<string, object>
-            {
-                { "r_a", 1.0 },
-                { "r_e", 1.0 },
-                { "l_a", 19e-6 },
-                { "l_e", 5.4e-3 },
-                { "l_e_prime", 1.7e-3 },
-                { "j_rotor", 0.025 }
-            });
-        }
+        motorNames = showHierarchyMenu.GetMotorNames();
+        robotNums = showHierarchyMenu.GetRobotId();
+        linkNames = showHierarchyMenu.GetLinkNames();
+        motorParamsList = showHierarchyMenu.GetMotorParameters();
 
         for (int i = 0; i < motorNames.Count; i++)
         {
@@ -169,6 +169,26 @@ public class ObjectData : MonoBehaviour
         }
 
     }
+
+    public async void SendConstraintsData()
+    {
+        addConstraintController.PopulateConstraintStringsList();
+        List<string> constraints = addConstraintController.GetConstraintStrings();
+
+        foreach (string constraint in constraints)
+        {
+            MySender.Instance.SendMessage("\n" + constraint);
+            await Task.Delay(20);
+        }
+    }
+
+    public void SendAllData()
+    {
+        sendRobotData();
+        //SendMotorData();
+        //SendConstraintsData();
+    }
+
 
     async Task Delayed(int milli)
     {

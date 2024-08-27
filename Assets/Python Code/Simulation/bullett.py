@@ -75,10 +75,19 @@ def get_joint_axis(robot_id, joint_index):
     return joint_axis
 
 
-def create_joint_constraint(first_obj, first_joint, second_obj, second_joint, joint_type, joint_axis=-1):
-    # Get the joint info to determine the link ID and joint axis
-    if joint_axis == -1:
-        joint_info = p.getJointInfo(first_obj, first_joint)
+def create_joint_constraint(first_obj, first_joint, second_obj, second_joint, joint_type):
+    p_joint_type = None
+    joint_axis = None
+
+    if joint_type == 'prismatic':
+        p_joint_type = p.JOINT_PRISMATIC
+    elif joint_type == 'revolute':
+        p_joint_type = p.JOINT_REVOLUTE
+    else:
+        p_joint_type = p.JOINT_FIXED
+
+    if first_obj == second_obj:
+        joint_info = p.getJointInfo(second_obj, second_joint)
         joint_axis = joint_info[13]  # Joint axis in the local frame
 
     p.createConstraint(
@@ -86,7 +95,7 @@ def create_joint_constraint(first_obj, first_joint, second_obj, second_joint, jo
         parentLinkIndex=first_joint,
         childBodyUniqueId=second_obj,
         childLinkIndex=second_joint,
-        jointType=joint_type,
+        jointType=p_joint_type,
         jointAxis=joint_axis,
         parentFramePosition=[0, 0, 0],
         childFramePosition=[0, 0, 0]

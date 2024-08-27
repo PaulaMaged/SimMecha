@@ -163,15 +163,59 @@ def parse_motor_message(messages):
     return motorNames, correspond_robot_num, correspond_links, motor_params
 
 
+def parse_constraint_message(messages):
+    # Initialize lists for each data type
+    robot1_nums = []
+    robot2_nums = []
+    robot1_links = []
+    robot2_links = []
+    constraint_types = []
+
+    # Updated regular expression to match the constraint pattern, including negative numbers
+    pattern = r'\((-?\d+),\s*(-?\d+),\s*\'?([^\']+?)\'?,\s*\'?([^\']+?)\'?,\s*\'?([^\']+?)\'?\)'
+
+    # Iterate over all the messages and extract constraints
+    messages_to_remove = []
+    for message in messages:
+        match = re.match(pattern, message)
+        if match:
+            robot1_num, robot2_num, robot1_link, robot2_link, constraint_type = match.groups()
+
+            # Append values to corresponding lists
+            robot1_nums.append(int(robot1_num))
+            robot2_nums.append(int(robot2_num))
+            robot1_links.append(robot1_link)
+            robot2_links.append(robot2_link)
+            constraint_types.append(constraint_type)
+
+            # Mark message for removal after successful processing
+            messages_to_remove.append(message)
+
+    # Remove processed messages from the original messages list
+    for message in messages_to_remove:
+        messages.remove(message)
+
+    # Print the lists inside the function
+    print("robot1_nums:", robot1_nums)
+    print("robot2_nums:", robot2_nums)
+    print("robot1_links:", robot1_links)
+    print("robot2_links:", robot2_links)
+    print("constraint_types:", constraint_types)
+
+    # Return the lists
+    return robot1_nums, robot2_nums, robot1_links, robot2_links, constraint_types
+
+
 if __name__ == '__main__':
     messages = [
         "C:\\Users\\Ayman Tarek\\Desktop\\pubullet_data\\pybullet_data\\franka_panda\\panda.urdf, (0.00, 5.00, 0.00), (0.00000, 0.00000, 0.00000, 1.00000), 1",
         "C:\\Users\\Ayman Tarek\\Desktop\\pubullet_data\\pybullet_data\\franka_panda\\panda.urdf, (0.00, 5.00, 0.00), (0.00000, 0.00000, 0.00000, 1.00000), 1",
         "(ExtExcitedDc, 0, panda_link1, {'r_a': 1, 'r_e': 1, 'l_a': 1.9000000000000001E-05, 'l_e': 0.0054000000000000003, 'l_e_prime': 0.0016999999999999999, 'j_rotor': 0.025000000000000001})",
         "(ExtExcitedDc, 0, panda_link2, {'r_a': 1, 'r_e': 1, 'l_a': 1.9000000000000001E-05, 'l_e': 0.0054000000000000003, 'l_e_prime': 0.0016999999999999999, 'j_rotor': 0.025000000000000001})",
-        # Additional lines...
+        "(1, -1, link1, link2, p.FIXEDCONSTRAINT)",
+        "(-4, 4, link3, link4, revolute)",
+        "(5, 6, link5, 'link6, prismatic)",
+        "(7, 8, link5, 'link6, prismatic)"
     ]
 
-    parse_robot_message(messages)
-    print(messages)
-    parse_motor_message(messages)
+    parse_constraint_message(messages)

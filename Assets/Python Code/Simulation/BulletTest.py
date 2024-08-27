@@ -14,23 +14,28 @@ physicsClient = None
 
 correspond_robot_num, correspond_joint_num = [], []
 
-def convert_link_names(links_received):
+def convert_link_names(links_received, robot_nums):
+    joint_nums = []
     for i, link in enumerate(links_received):
-        robot_index = correspond_robot_num[i]
+        if link == 'plane':
+            joint_nums.append(0)
+            continue
+        robot_index = robot_nums[i]
         links = link_names[robot_index]
         try:
             joint_ind = links.index(link)
-            correspond_joint_num.append(joint_ind)
+            joint_nums.append(joint_ind)
         except ValueError:
             print(f'Link name "{link}" not found!')
 
-    print('correspond_joint_num:', correspond_joint_num)
+    print('joint_nums:', joint_nums)
+    return joint_nums
 
 def init():
     global robot_id, correspond_robot_num, correspond_joint_num, physicsClient, link_names
     while len(TCP.messages) == 0:
         continue
-    time.sleep(1)
+    time.sleep(3)
     TCP.split_message()
     TCP.starting_flag = False
 
@@ -41,14 +46,25 @@ def init():
     b.set_gravity([0, 0, -9.80665])
 
     for i in range(len(urls)):
-        robot_id.append(b.load_robot(urls[i], positions[i], orientations[i], scalings[i] * 3))
+        robot_id.append(b.load_robot(urls[i], positions[i], orientations[i], scalings[i]))
         link_names.append(b.get_joint_names(robot_id[i]))
-        b.create_joint_constraint(robot_id[i], -1, plane_id, -1, p.JOINT_FIXED, 0)
-        #for j in range(p.getNumJoints(robot_id[i])):
-            #b.lock_link(robot_id[i], j, 1000)
 
     mot.motorNames, correspond_robot_num, links_received, mot.motor_params = TCP.parse_motor_message(TCP.messages)
-    convert_link_names(links_received)
+
+    correspond_joint_num = convert_link_names(links_received, correspond_robot_num)
+    robot1_nums, robot2_nums, links1, links2, constraint_types = TCP.parse_constraint_message(TCP.messages)
+
+    joint1_nums = convert_link_names(links1, robot1_nums)
+    joint2_nums = convert_link_names(links2, robot2_nums)
+    joint1_nums = [joint1_nums - 1 for joint1_nums in joint1_nums]
+    joint2_nums = [joint2_nums - 1 for joint2_nums in joint2_nums]
+    print(joint1_nums)
+    print(joint2_nums)
+    # convert_link_names
+    for i in range(len(robot1_nums)):
+        robot1 = plane_id if robot1_nums[i] == -1 else robot_id[robot1_nums[i]]
+        robot2 = plane_id if robot2_nums[i] == -1 else robot_id[robot2_nums[i]]
+        b.create_joint_constraint(robot1, joint1_nums[i], robot2, joint2_nums[i], constraint_types[i])
 
     mot.motor_process = True
 
@@ -59,15 +75,15 @@ def update():
     for i in range(len(mot.motorClasses)):
         robot = robot_id[correspond_robot_num[i]]
         b.set_joint_speed(robot, correspond_joint_num[i], mot.omega[i], mot.torque[i])
-        #b.unlock_link(robot, correspond_joint_num[i])
-        p.stepSimulation()
-        time.sleep(1. / 240.)
 
-        if p.getConnectionInfo(physicsClient)['isConnected'] == 0:
-            print("PyBullet window closed.")
-            TCP.sock.close()
-            print("socket should have been closed")
-            os._exit(0)
+    p.stepSimulation()
+    time.sleep(1. / 240.)
+
+    if p.getConnectionInfo(physicsClient)['isConnected'] == 0:
+        print("PyBullet window closed.")
+        TCP.sock.close()
+        print("socket should have been closed")
+        os._exit(0)
 
 def main():
     init()
