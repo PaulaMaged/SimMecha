@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -7474,6 +7474,7 @@ MonoBehaviour:
     type: 3}
   contentTransform: {fileID: 904229790}
   hierarchyPanel: {fileID: 709513113}
+  motorPopupManager: {fileID: 1761855626}
 --- !u!224 &1528140084
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7811,7 +7812,7 @@ RectTransform:
   m_GameObject: {fileID: 1627305096}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8374999, y: 0.99999994, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1044308310}
@@ -7821,7 +7822,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 630, y: 465}
+  m_AnchoredPosition: {x: 631, y: 465}
   m_SizeDelta: {x: 100, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1627305098
@@ -8969,6 +8970,62 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
+--- !u!1 &1761855625
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1761855627}
+  - component: {fileID: 1761855626}
+  m_Layer: 0
+  m_Name: MotorPopupManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1761855626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761855625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8615a8ee5f589ae4db1e592847bc5269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dcMotorPrefab: {fileID: 8793331904176103947, guid: 011be077a4e81964db6a131cef88f6d9,
+    type: 3}
+  stepperMotorPrefab: {fileID: 8793331904176103947, guid: db623e6bbbb26a245b5a37b28e66ab8e,
+    type: 3}
+  DoublyFedInduction: {fileID: 8793331904176103947, guid: 1914d9b8fa429964fa04a7f379f17203,
+    type: 3}
+  ExtExcitedDc: {fileID: 8793331904176103947, guid: d966edb2e000dee43bcb2c0b97f80711,
+    type: 3}
+  ExtExcitedSynch: {fileID: 8793331904176103947, guid: 3b6aa7ccaabf83445a6c9df606346e58,
+    type: 3}
+  PermExcitedDc: {fileID: 8793331904176103947, guid: 6ff01723adf16a546a446690fb5cc881,
+    type: 3}
+--- !u!4 &1761855627
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761855625}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 838.1468, y: 495.7501, z: 6.4246492}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1762955436
 GameObject:
   m_ObjectHideFlags: 0
