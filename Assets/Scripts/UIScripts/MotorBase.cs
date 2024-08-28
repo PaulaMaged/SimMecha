@@ -134,6 +134,29 @@ public class PermExcitedDc : MotorBase
     }
 }
 
+public class PermMagnetSynch : MotorBase
+{
+    public object r_s { get; set; } = 15.55e-1;  // Stator resistance (mOhm)
+    public object l_d { get; set; } = 1.66e-1;   // Direct axis inductance (mH)
+    public object l_q { get; set; } = 0.35e-1;   // Quadrature axis inductance (mH)
+    public int p { get; set; } = 3;               // Pole pair number
+    public object j_rotor { get; set; } = 0.03883; // Moment of inertia of the rotor (kg·m²)
+
+    public override string MotorName => "PermMagnetSynch";
+
+    public override Dictionary<string, object> GetAttributes()
+    {
+        return new Dictionary<string, object>
+        {
+            { "r_s", r_s },
+            { "l_d", l_d },
+            { "l_q", l_q },
+            { "p", p },
+            { "j_rotor", j_rotor }
+        };
+    }
+}
+
 public class SeriesDc : MotorBase
 {
     public object r_a { get; set; } = 16e-3;      // Armature circuit resistance (Ohm)

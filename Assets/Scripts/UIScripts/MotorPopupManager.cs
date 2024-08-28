@@ -14,6 +14,7 @@ public class MotorPopupManager : MonoBehaviour
     public GameObject ShuntDc;
     public GameObject SquirrelCageInduction;
     public GameObject SynchReluctance;
+    public GameObject PermMagnetSynch;
 
     private GameObject motorPopupInstance;
     private ShowHierarchyMenu showHierarchyMenu;
@@ -29,20 +30,21 @@ public class MotorPopupManager : MonoBehaviour
 
     public void ShowMotorPopup(int robotId, string linkName, string motorType, Dictionary<string, object> linkMotorSelections)
     {
+        Debug.Log($"ShowMotorPopup called with robotId: {robotId}, linkName: {linkName}, motorType: {motorType}");
+
         if (motorPopupInstance != null)
         {
             Destroy(motorPopupInstance);
-            motorPopupInstance = null; // Reset the motorPopupInstance to ensure it's cleared
+            motorPopupInstance = null;
         }
 
         MotorBase motor = CreateMotorInstance(motorType);
         if (motor == null)
         {
-            Debug.LogError("Unknown motor type: " + motorType);
+            Debug.LogError($"Unknown motor type: {motorType}");
             return;
         }
 
-        // Ensure all default attributes are included in linkMotorSelections
         var defaultAttributes = motor.GetAttributes();
         foreach (var attribute in defaultAttributes)
         {
@@ -53,6 +55,14 @@ public class MotorPopupManager : MonoBehaviour
         }
 
         motorPopupInstance = InstantiateMotorPrefab(motorType);
+        if (motorPopupInstance != null)
+        {
+            Debug.Log($"Motor popup instance successfully instantiated.");
+        }
+        else
+        {
+            Debug.LogError($"Motor popup instance failed to instantiate.");
+        }
         motorPopupInstance.transform.SetParent(FindObjectOfType<Canvas>().transform, false);
 
         SetupInputFields(motor, linkMotorSelections);
@@ -64,7 +74,7 @@ public class MotorPopupManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Confirm button not found in the motor popup prefab.");
+            Debug.LogError($"Confirm button not found in the motor popup prefab.");
         }
 
         TMP_Text motorNameText = motorPopupInstance.transform.Find("MotorName")?.GetComponent<TMP_Text>();
@@ -74,17 +84,14 @@ public class MotorPopupManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("MotorName text component not found in the prefab.");
+            Debug.LogError($"MotorName text component not found in the prefab.");
         }
     }
-
-
 
     private MotorBase CreateMotorInstance(string motorType)
     {
         switch (motorType)
         {
-            
             case "DoublyFedInduction":
                 return new DoublyFedInduction();
             case "ExtExcitedDc":
@@ -101,6 +108,8 @@ public class MotorPopupManager : MonoBehaviour
                 return new SquirrelCageInduction();
             case "SynchReluctance":
                 return new SynchReluctance();
+            case "PermMagnetSynch":
+                return new PermMagnetSynch();
             default:
                 return null;
         }
@@ -110,7 +119,6 @@ public class MotorPopupManager : MonoBehaviour
     {
         switch (motorType)
         {
-           
             case "DoublyFedInduction":
                 return Instantiate(DoublyFedInduction, Vector3.zero, Quaternion.identity);
             case "ExtExcitedDc":
@@ -127,23 +135,24 @@ public class MotorPopupManager : MonoBehaviour
                 return Instantiate(SquirrelCageInduction, Vector3.zero, Quaternion.identity);
             case "SynchReluctance":
                 return Instantiate(SynchReluctance, Vector3.zero, Quaternion.identity);
+            case "PermMagnetSynch":
+                return Instantiate(PermMagnetSynch, Vector3.zero, Quaternion.identity);
             default:
-                Debug.LogError("Unknown motor type: " + motorType);
+                Debug.LogError($"Unknown motor type: {motorType}");
                 return null;
         }
     }
 
     private void SetupInputFields(MotorBase motor, Dictionary<string, object> linkMotorSelections)
     {
+        Debug.Log($"Setting up input fields for motor: {motor.MotorName}");
         foreach (var attribute in motor.GetAttributes())
         {
-            TMP_InputField inputField = FindInputField(attribute.Key + "Input");
+            TMP_InputField inputField = FindInputField($"{attribute.Key}Input");
             if (inputField != null)
             {
-                // Set the initial value
                 inputField.text = attribute.Value.ToString();
 
-                // No dictionary update here
             }
             else
             {
@@ -151,7 +160,6 @@ public class MotorPopupManager : MonoBehaviour
             }
         }
     }
-
 
     private TMP_InputField FindInputField(string fieldName)
     {
@@ -161,65 +169,52 @@ public class MotorPopupManager : MonoBehaviour
 
     public void ConfirmPopup(int robotId, string linkName, Dictionary<string, object> motorAttributes)
     {
-        if (showHierarchyMenu == null)
+        Debug.Log($"ConfirmPopup called.");
+
+        try
         {
-            Debug.LogError("ShowHierarchyMenu reference is missing.");
-            return;
-        }
+            TMP_InputField[] inputFields = motorPopupInstance.GetComponentsInChildren<TMP_InputField>(true);
+            foreach (var inputField in inputFields)
+            {
+                string key = inputField.name.Replace("Input", "");
 
-        TMP_InputField[] inputFields = motorPopupInstance.GetComponentsInChildren<TMP_InputField>(true);
-        foreach (var inputField in inputFields)
+                if (float.TryParse(inputField.text, out float floatValue))
+                {
+                    motorAttributes[key] = floatValue;
+                }
+                else if (int.TryParse(inputField.text, out int intValue))
+                {
+                    motorAttributes[key] = intValue;
+                }
+                else
+                {
+                    motorAttributes[key] = inputField.text; // Store as string if not a number
+                }
+            }
+
+           
+            showHierarchyMenu.UpdateLinkMotorSelections(robotId, linkName, motorAttributes);
+
+            PrintDictionaryContents(robotId, linkName);
+            CloseMotorPopup();
+
+            Debug.Log($"ConfirmPopup finished successfully.");
+        }
+        catch (System.Exception ex)
         {
-            string key = inputField.name.Replace("Input", "");
-
-            if (float.TryParse(inputField.text, out float floatValue))
-            {
-                motorAttributes[key] = floatValue;
-            }
-            else if (int.TryParse(inputField.text, out int intValue))
-            {
-                motorAttributes[key] = intValue;
-            }
-            else
-            {
-                motorAttributes[key] = inputField.text; // Store as string if not a number
-            }
+            Debug.LogError($"Exception in ConfirmPopup: {ex.Message}");
         }
-
-        // Log before updating
-        Debug.Log($"Before Update: robotId: {robotId}, linkName: {linkName}, motorAttributes: {motorAttributes.Count}");
-        showHierarchyMenu.UpdateLinkMotorSelections(robotId, linkName, motorAttributes);
-        Debug.Log($"After Update: robotId: {robotId}, linkName: {linkName}");
-
-        var linkMotorSelections = showHierarchyMenu.GetLinkMotorSelections();
-        if (linkMotorSelections.TryGetValue((robotId, linkName), out var motorParams))
-        {
-            Debug.Log($"Robot ID: {robotId}");
-            Debug.Log($"Link Name: {linkName}");
-            Debug.Log("Motor Parameters:");
-            foreach (var param in motorParams)
-            {
-                Debug.Log($"{param.Key}: {param.Value}");
-            }
-        }
-        else
-        {
-            Debug.LogError($"No entry found for Robot ID: {robotId} and Link Name: {linkName}");
-        }
-
-        CloseMotorPopup();
     }
-
-
 
     private void PrintDictionaryContents(int robotId, string linkName)
     {
+        Debug.Log($"PrintDictionaryContents called.");
         var linkMotorSelections = showHierarchyMenu.GetLinkMotorSelections();
         if (linkMotorSelections.TryGetValue((robotId, linkName), out var motorParams))
         {
             Debug.Log($"Robot ID: {robotId}");
             Debug.Log($"Link Name: {linkName}");
-            Debug.Log("Motor Parameters:");
+            Debug.Log($"Motor Parameters:");
             foreach (var param in motorParams)
             {
                 Debug.Log($"{param.Key}: {param.Value}");
@@ -235,7 +230,7 @@ public class MotorPopupManager : MonoBehaviour
     {
         if (motorPopupInstance != null)
         {
-            Debug.Log("Closing motorPopupInstance.");
+            Debug.Log($"Closing motorPopupInstance.");
             Destroy(motorPopupInstance);
         }
     }

@@ -1365,6 +1365,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltipMessage: Armature inductance (Henry)
+  useRightTooltip: 0
 --- !u!1 &6210297246855405923
 GameObject:
   m_ObjectHideFlags: 0
@@ -2067,6 +2068,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltipMessage: "Rotor inertia (kg\xB7m\xB2)"
+  useRightTooltip: 0
 --- !u!1 &8615061205143162493
 GameObject:
   m_ObjectHideFlags: 0
@@ -2183,6 +2185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltipMessage: Armature resistance (Ohm)
+  useRightTooltip: 0
 --- !u!1 &8793331904176103947
 GameObject:
   m_ObjectHideFlags: 0

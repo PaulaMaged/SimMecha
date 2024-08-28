@@ -14,18 +14,35 @@ public class ShowHierarchyMenu : MonoBehaviour
 
     public MotorPopupManager motorPopupManager;
 
-    private List<string> motorList = new List<string> {"DoublyFedInduction", "ExtExcitedDc", "ExtExcitedSynch", "PermExcitedDc", "SeriesDc", "ShuntDc", "SquirrelCageInduction", "SynchReluctance" };
+    private List<string> motorList = new List<string> {"DoublyFedInduction", "ExtExcitedDc", "ExtExcitedSynch", "PermExcitedDc", "PermMagnetSynch", "SeriesDc", "ShuntDc", "SquirrelCageInduction", "SynchReluctance" };
     private static Dictionary<(int robotId, string linkName), Dictionary<string, object>> LinkMotorSelections = new Dictionary<(int robotId, string linkName), Dictionary<string, object>>();
     // Dictionary((robotId, linkName), Dictionary<string, Object>);
 
-    public static List<string> motorNames;
-    public static List<int> robotId;
-    public static List<string> linkNames;
-    public static List<Dictionary<string, object>> motorParameters;
-    
+    private static List<string> motorNames = new List<string>();
+    private static List<int> robotId = new List<int>();
+    private static List<string> linkNames = new List<string>();
+    private static List<Dictionary<string, object>> motorParameters = new List<Dictionary<string, object>>();
+
+
     void Start()
     {
         hierarchyPanel.SetActive(false);
+        
+    }
+
+    public void OnPopulateButtonClick()
+    {
+        PopulateFinalLists();
+
+        List<string> names = GetMotorNames();
+        List<int> ids = GetRobotId();
+        List<string> links = GetLinkNames();
+        List<Dictionary<string, object>> parameters = GetMotorParameters();
+
+        Debug.Log("Motor Names: " + string.Join(", ", names));
+        Debug.Log("Robot IDs: " + string.Join(", ", ids));
+        Debug.Log("Link Names: " + string.Join(", ", links));
+        Debug.Log("Motor Parameters: " + string.Join(", ", parameters.Select(p => p.ToString())));
     }
 
     private void CreateHierarchyItems()
@@ -152,6 +169,7 @@ public class ShowHierarchyMenu : MonoBehaviour
         Debug.Log($"Stored selection: {robotId} -> {linkSelection} -> {motorSelection}");
 
         motorPopupManager.ShowMotorPopup(robotId, linkSelection, motorSelection, LinkMotorSelections[key]);
+
     }
 
 
@@ -234,18 +252,48 @@ public class ShowHierarchyMenu : MonoBehaviour
     }
 
     public static void PopulateFinalLists()
-{
-    foreach (var parentKey in LinkMotorSelections.Keys)
     {
-        robotId.Add(parentKey.robotId);
-        linkNames.Add(parentKey.linkName);
+        Debug.Log("PopulateFinalLists called");
+        Debug.Log($"LinkMotorSelections count: {LinkMotorSelections.Count}");
 
-        Dictionary<string, object> currentMotorParam = LinkMotorSelections[parentKey];
+        foreach (var parentKey in LinkMotorSelections.Keys)
+        {
 
-        if (currentMotorParam.ContainsKey("motorName")) motorNames.Add(currentMotorParam["motorName"].ToString());
-        currentMotorParam.Remove("motorName");
-        motorParameters.Add(currentMotorParam);
+            robotId.Add(parentKey.robotId);
+            linkNames.Add(parentKey.linkName);
+
+            Dictionary<string, object> currentMotorParam = LinkMotorSelections[parentKey];
+
+            if (currentMotorParam.ContainsKey("motorName"))
+            {
+                motorNames.Add(currentMotorParam["motorName"].ToString());
+            }
+
+            currentMotorParam.Remove("motorName");
+            motorParameters.Add(currentMotorParam);
+        }
+
+        Debug.Log("PopulateFinalLists finished");
     }
-}
-    
+
+    public List<string> GetMotorNames()
+    {
+        return motorNames; 
+    }
+
+    public List<int> GetRobotId()
+    {
+        return robotId; 
+    }
+
+    public List<string> GetLinkNames()
+    {
+        return linkNames; 
+    }
+
+    public List<Dictionary<string, object>> GetMotorParameters()
+    {
+        return motorParameters; 
+    }
+
 }
