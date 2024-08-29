@@ -35,7 +35,7 @@ public class SimulIDEFileScript : MonoBehaviour
     {
         if (string.IsNullOrEmpty(simulIDEPath) || !File.Exists(simulIDEPath))
         {
-            UnityEngine.Debug.LogWarning("SimulIDE executable not found.");
+            PopUpController.Instance.ShowMessage("SimulIDE executable not found.");
             return;
         }
 
@@ -58,7 +58,7 @@ public class SimulIDEFileScript : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.LogWarning("No file selected.");
+            PopUpController.Instance.ShowMessage("No file selected.");
         }
     }
 

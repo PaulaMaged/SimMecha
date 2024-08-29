@@ -37,7 +37,7 @@ public class SimulIDEScript : MonoBehaviour
             }
             else
             {
-                UnityEngine.Debug.LogWarning("No file selected.");
+                PopUpController.Instance.ShowMessage("No file selected.");
                 return;
             }
         }

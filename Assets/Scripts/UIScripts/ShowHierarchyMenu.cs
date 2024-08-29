@@ -39,10 +39,10 @@ public class ShowHierarchyMenu : MonoBehaviour
         List<string> links = GetLinkNames();
         List<Dictionary<string, object>> parameters = GetMotorParameters();
 
-        Debug.Log("Motor Names: " + string.Join(", ", names));
-        Debug.Log("Robot IDs: " + string.Join(", ", ids));
-        Debug.Log("Link Names: " + string.Join(", ", links));
-        Debug.Log("Motor Parameters: " + string.Join(", ", parameters.Select(p => p.ToString())));
+        PopUpController.Instance.ShowMessage("Motor Names: " + string.Join(", ", names));
+        PopUpController.Instance.ShowMessage("Robot IDs: " + string.Join(", ", ids));
+        PopUpController.Instance.ShowMessage("Link Names: " + string.Join(", ", links));
+        PopUpController.Instance.ShowMessage("Motor Parameters: " + string.Join(", ", parameters.Select(p => p.ToString())));
     }
 
     private void CreateHierarchyItems()
@@ -119,11 +119,11 @@ public class ShowHierarchyMenu : MonoBehaviour
 
         if (LinkMotorSelections.Remove((robotId, linkSelection)))
         {
-            Debug.Log($"Deleted selection: {robotId} -> {linkSelection} -> {motorSelection}");
+            PopUpController.Instance.ShowMessage($"Deleted selection: {robotId} -> {linkSelection} -> {motorSelection}");
         }
         else
         {
-            Debug.Log("Link Motor selection was not found");
+            PopUpController.Instance.ShowMessage("Link Motor selection was not found");
         }
     }
 
@@ -166,7 +166,7 @@ public class ShowHierarchyMenu : MonoBehaviour
 
         LinkMotorSelections[key]["motorName"] = motorSelection;
 
-        Debug.Log($"Stored selection: {robotId} -> {linkSelection} -> {motorSelection}");
+        PopUpController.Instance.ShowMessage($"Stored selection: {robotId} -> {linkSelection} -> {motorSelection}");
 
         motorPopupManager.ShowMotorPopup(robotId, linkSelection, motorSelection, LinkMotorSelections[key]);
 
@@ -253,8 +253,8 @@ public class ShowHierarchyMenu : MonoBehaviour
 
     public static void PopulateFinalLists()
     {
-        Debug.Log("PopulateFinalLists called");
-        Debug.Log($"LinkMotorSelections count: {LinkMotorSelections.Count}");
+        PopUpController.Instance.ShowMessage("PopulateFinalLists called");
+        PopUpController.Instance.ShowMessage($"LinkMotorSelections count: {LinkMotorSelections.Count}");
 
         foreach (var parentKey in LinkMotorSelections.Keys)
         {
@@ -273,7 +273,7 @@ public class ShowHierarchyMenu : MonoBehaviour
             motorParameters.Add(currentMotorParam);
         }
 
-        Debug.Log("PopulateFinalLists finished");
+        PopUpController.Instance.ShowMessage("PopulateFinalLists finished");
     }
 
     public List<string> GetMotorNames()

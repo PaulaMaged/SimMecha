@@ -21,13 +21,12 @@ namespace UIScripts
         private TMP_Dropdown[] linkDropdowns;
         private TMP_Dropdown constraintDropdown;
 
-        private List<TMP_Dropdown.OptionData> robots = new List<TMP_Dropdown.OptionData>();
-        private List<TMP_Dropdown.OptionData> links = new List<TMP_Dropdown.OptionData>();
+        private List<TMP_Dropdown.OptionData> robots = new();
+        private List<TMP_Dropdown.OptionData> links = new();
 
-        private Dictionary<int, List<string>> selectedLinksByRobot = new Dictionary<int, List<string>>();
-        // Dictionary<(Robot1.Link2, Robot2.Link3), constraint>;
+        private Dictionary<int, List<string>> selectedLinksByRobot = new();
         private Dictionary<((int robotId, string link), (int robotId, string link)), string> _linkConstraints;
-        private static List<string> constraintStrings = new List<string>();
+        private static List<string> constraintStrings = new();
 
         private void Awake()
         {
@@ -35,7 +34,7 @@ namespace UIScripts
             _confirmButton.onClick.AddListener(OnConfirmButtonClick);
         }
 
-        void Start()
+        private void Start()
         {
             _linkConstraints = new Dictionary<((int robotId, string link), (int robotId, string link)), string>();
 
@@ -45,7 +44,7 @@ namespace UIScripts
 
             _constraintPanel.SetActive(false);
 
-            List<string> constraintOptions = new List<string>
+            var constraintOptions = new List<string>
             {
                 "Constraint 1",
                 "Constraint 2",
@@ -54,7 +53,7 @@ namespace UIScripts
 
             constraintDropdown.ClearOptions();
             constraintDropdown.AddOptions(constraintOptions);
-            
+
             PopulateConstraintPanel();
         }
 
@@ -63,24 +62,29 @@ namespace UIScripts
             robots.Clear();
             selectedLinksByRobot.Clear();
 
-            int counter = 0;
-            
+            // Always add the "plane" option first
             robots.Add(new TMP_Dropdown.OptionData("plane"));
-            
-            foreach (GameObject robot in RuntimeURDFLoader.ImportedRobots)
+            selectedLinksByRobot.Add(0, new List<string> { "plane" });
+
+            foreach (var linkDropdown in linkDropdowns)
+            {
+                linkDropdown.ClearOptions();
+                linkDropdown.AddOptions(new List<string> { "plane" });
+            }
+
+            var robotIndex = 1;
+            foreach (var robot in RuntimeURDFLoader.ImportedRobots)
             {
                 robots.Add(new TMP_Dropdown.OptionData(robot.name));
-                selectedLinksByRobot[robots.Count - 1] = new List<string>();
-                
+                selectedLinksByRobot[robotIndex] = new List<string>();
+
                 links.Clear();
+                AddLinksToLinkMenu(links, robot.transform);
 
-                if(robot.name.Equals("plane")) links.Add(new TMP_Dropdown.OptionData("plane"));
-                else AddLinksToLinkMenu(links, robot.transform);
-                
-                linkDropdowns[counter].options.Clear();
-                linkDropdowns[counter].AddOptions(links);
+                linkDropdowns[robotIndex - 1].ClearOptions();
+                linkDropdowns[robotIndex - 1].AddOptions(links.Select(link => link.text).ToList());
 
-                counter++;
+                robotIndex++;
             }
 
             foreach (var robotDropdown in robotDropdowns)
@@ -88,55 +92,62 @@ namespace UIScripts
                 robotDropdown.options.Clear();
                 robotDropdown.AddOptions(robots);
             }
-            
+
             // Register selection events
-            for (int i = 0; i < robotDropdowns.Length; i++)
+            for (var i = 0; i < robotDropdowns.Length; i++)
             {
-                int index = i; // Capture the index for the lambda
-                robotDropdowns[i].onValueChanged.AddListener(delegate { OnRobotDropdownChanged(robotDropdowns[index], index); });
-                linkDropdowns[i].onValueChanged.AddListener(delegate { OnLinkDropdownChanged(linkDropdowns[index], index); });
+                var index = i; // Capture the index for the lambda
+                robotDropdowns[i].onValueChanged.AddListener(delegate
+                {
+                    OnRobotDropdownChanged(robotDropdowns[index], index);
+                });
+                linkDropdowns[i].onValueChanged.AddListener(delegate
+                {
+                    OnLinkDropdownChanged(linkDropdowns[index], index);
+                });
             }
         }
 
         private static void AddLinksToLinkMenu(List<TMP_Dropdown.OptionData> linkDropdownOptions, Transform parent)
         {
             if (parent.GetComponent<UrdfLink>() != null)
-            {
                 linkDropdownOptions.Add(new TMP_Dropdown.OptionData(parent.name));
-            }
 
-            foreach (Transform child in parent)
-            {
-                AddLinksToLinkMenu(linkDropdownOptions, child);
-            }
+            foreach (Transform child in parent) AddLinksToLinkMenu(linkDropdownOptions, child);
         }
 
         private void OnRobotDropdownChanged(TMP_Dropdown robotDropdown, int dropdownIndex)
         {
-            int selectedRobotIndex = robotDropdown.value;
+            var selectedRobotIndex = robotDropdown.value;
 
-            // Filter out links that have already been selected for this robot
-            var availableLinks = links.Where(link => !selectedLinksByRobot[selectedRobotIndex].Contains(link.text)).ToList();
+            // Ensure there's a selected robot
+            if (selectedRobotIndex >= 0 && selectedRobotIndex < robots.Count)
+            {
+                // Clear existing options in the link dropdown
+                linkDropdowns[dropdownIndex].ClearOptions();
 
-            // Update the corresponding link dropdown with available links
-            linkDropdowns[dropdownIndex].ClearOptions();
-            linkDropdowns[dropdownIndex].AddOptions(availableLinks);
+                if (selectedRobotIndex == 0)
+                {
+                    // If the first option (plane) is selected, only "plane" should be available
+                    linkDropdowns[dropdownIndex].AddOptions(new List<string> { "plane" });
+                }
+                else
+                {
+                    // Populate the link dropdown with the available links for the selected robot
+                    var availableLinks = links
+                        .Where(link => !selectedLinksByRobot[selectedRobotIndex].Contains(link.text)).ToList();
+                    linkDropdowns[dropdownIndex].AddOptions(availableLinks.Select(link => link.text).ToList());
+                }
+            }
         }
 
         private void OnLinkDropdownChanged(TMP_Dropdown linkDropdown, int dropdownIndex)
         {
-            int selectedRobotIndex = robotDropdowns[dropdownIndex].value;
-            string selectedLinkName = linkDropdown.options[linkDropdown.value].text;
+            var selectedRobotIndex = robotDropdowns[dropdownIndex].value;
+            var selectedLinkName = linkDropdown.options[linkDropdown.value].text;
 
             if (!selectedLinksByRobot[selectedRobotIndex].Contains(selectedLinkName))
-            {
                 selectedLinksByRobot[selectedRobotIndex].Add(selectedLinkName);
-            }
-            else
-            {
-                // Handle duplicate link selection (optional: show error, revert selection)
-                Debug.LogWarning("This link has already been selected for the chosen robot.");
-            }
         }
 
         private void OnToggleButtonClick()
@@ -147,55 +158,90 @@ namespace UIScripts
 
         private void OnConfirmButtonClick()
         {
-            // Gather selections from dropdowns
-            int firstRobotIndex = robotDropdowns[0].value;
-            int secondRobotIndex = robotDropdowns[1].value;
+            var firstRobotIndex = robotDropdowns[0].value - 1;
+            var secondRobotIndex = robotDropdowns[1].value - 1;
 
-            int firstLinkIndex = linkDropdowns[0].value;
-            int secondLinkIndex = linkDropdowns[1].value;
+            var firstLinkIndex = linkDropdowns[0].value;
+            var secondLinkIndex = linkDropdowns[1].value;
 
-            string constraint = constraintDropdown.options[constraintDropdown.value].text;
+            var constraint = constraintDropdown.options[constraintDropdown.value].text;
 
-            if (firstRobotIndex == 0)
+            // Validate indices before proceeding
+            if (!IsValidIndex(firstRobotIndex, RuntimeURDFLoader.NewImportedRobots.Count) ||
+                !IsValidIndex(secondRobotIndex, RuntimeURDFLoader.NewImportedRobots.Count))
             {
-                // Add to the _linkConstraints dictionary
+                PopUpController.Instance.ShowMessage("Invalid robot selection.");
+                return;
+            }
+
+            if (firstRobotIndex == secondRobotIndex && firstLinkIndex == secondLinkIndex)
+            {
+                PopUpController.Instance.ShowMessage(
+                    "Cannot process this request, since you cannot add a constraint between a link and itself");
+                return;
+            }
+
+            if (!IsValidIndex(firstLinkIndex, RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links.Count) ||
+                !IsValidIndex(secondLinkIndex, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links.Count))
+            {
+                PopUpController.Instance.ShowMessage("Invalid link selection.");
+                return;
+            }
+
+            if (firstRobotIndex == 0 || secondRobotIndex == 0)
+                AddPlaneConstraint(firstRobotIndex, secondRobotIndex, firstLinkIndex, secondLinkIndex, constraint);
+            else
                 _linkConstraints.Add(
-                    ((-1, "plane"), 
-                        (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
+                    ((RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex]),
+                        (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId,
+                            RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
                     constraint
                 );
-            } else if (secondRobotIndex == 0)
+
+            PopUpController.Instance.ShowMessage("Constraint added successfully!\n" +
+                                                 $"Id1: {RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId} -- Link1: {RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex]}" +
+                                                 $"Id2: {RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId} -- Link2: {RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex]}" +
+                                                 $"Constraint: {constraint}"
+            );
+        }
+
+        private void AddPlaneConstraint(int firstRobotIndex, int secondRobotIndex, int firstLinkIndex,
+            int secondLinkIndex, string constraint)
+        {
+            if (!IsValidIndex(firstRobotIndex, RuntimeURDFLoader.NewImportedRobots.Count) ||
+                !IsValidIndex(secondRobotIndex, RuntimeURDFLoader.NewImportedRobots.Count))
             {
-                // Add to the _linkConstraints dictionary
+                PopUpController.Instance.ShowMessage("Invalid robot or link selection.");
+                return;
+            }
+
+            if (firstRobotIndex == 0)
                 _linkConstraints.Add(
-                    ((RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex]),
+                    ((-1, "plane"),
+                        (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId,
+                            RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
+                    constraint
+                );
+            else if (secondRobotIndex == 0)
+                _linkConstraints.Add(
+                    ((RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex]),
                         (-1, "plane")),
                     constraint
                 );
-            }
-            else
-            {
-                // Add to the _linkConstraints dictionary
-                _linkConstraints.Add(
-                    ((RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex]), 
-                        (RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId, RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex])),
-                    constraint
-                );
-            }
+        }
 
-            Debug.Log("Constraint added successfully!\n" +
-                      $"Id1: { RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].RobotId } -- Link1: { RuntimeURDFLoader.NewImportedRobots[firstRobotIndex].Links[firstLinkIndex] }" +
-                      $"Id2: { RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].RobotId } -- Link1: { RuntimeURDFLoader.NewImportedRobots[secondRobotIndex].Links[secondLinkIndex] }" +
-                      $"Constraint: { constraint }"
-                );
+        private bool IsValidIndex(int index, int count)
+        {
+            Debug.Log("index: " + index);
+            Debug.Log("count :" + count);
+            return index >= 0 && index < count;
         }
 
         public void PopulateConstraintStringsList()
         {
             foreach (var keyValuePair in _linkConstraints)
-            {
-                constraintStrings.Add($"{keyValuePair.Key.Item1.robotId}, {keyValuePair.Key.Item1.link}, {keyValuePair.Key.Item2.robotId}, {keyValuePair.Key.Item2.link}, {keyValuePair.Value}");
-            }
+                constraintStrings.Add(
+                    $"{keyValuePair.Key.Item1.robotId}, {keyValuePair.Key.Item1.link}, {keyValuePair.Key.Item2.robotId}, {keyValuePair.Key.Item2.link}, {keyValuePair.Value}");
         }
     }
 }

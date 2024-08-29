@@ -52,6 +52,14 @@ public class RuntimeURDFLoader : MonoBehaviour
         ImportedRobots = new List<GameObject>();
         NewImportedRobots = new List<RobotModel>();
         RobotIdToGameObject = new Dictionary<int, GameObject>();
+
+        // GameObject plane = new GameObject();
+        //
+        // RobotIdentifier identifier = plane.AddComponent<RobotIdentifier>();
+        // identifier.robotId = -1;
+        //
+        // ImportedRobots.Add(plane);
+        // NewImportedRobots.Add(new RobotModel(plane, identifier.robotId, "", new List<string>() {"plane"}));
     }
 
     void Start()
@@ -90,7 +98,7 @@ public class RuntimeURDFLoader : MonoBehaviour
         }
         else
         {
-            Debug.LogError("No file selected.");
+            PopUpController.Instance.ShowMessage("No file selected.");
         }
     }
 
@@ -135,12 +143,12 @@ public class RuntimeURDFLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Failed to import URDF model.");
+                PopUpController.Instance.ShowMessage("Failed to import URDF model.");
             }
         }
         else
         {
-            Debug.LogError("Invalid URDF file path.");
+            PopUpController.Instance.ShowMessage("Invalid URDF file path.");
         }
     }
 
@@ -166,12 +174,12 @@ public class RuntimeURDFLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("No object selected in the hierarchy.");
+                PopUpController.Instance.ShowMessage("No object selected in the hierarchy.");
             }
         }
         else
         {
-            Debug.LogWarning("Invalid scale value.");
+            PopUpController.Instance.ShowMessage("Invalid scale value.");
         }
     }
     
