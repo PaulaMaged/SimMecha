@@ -52,14 +52,6 @@ public class RuntimeURDFLoader : MonoBehaviour
         ImportedRobots = new List<GameObject>();
         NewImportedRobots = new List<RobotModel>();
         RobotIdToGameObject = new Dictionary<int, GameObject>();
-
-        // GameObject plane = new GameObject();
-        //
-        // RobotIdentifier identifier = plane.AddComponent<RobotIdentifier>();
-        // identifier.robotId = -1;
-        //
-        // ImportedRobots.Add(plane);
-        // NewImportedRobots.Add(new RobotModel(plane, identifier.robotId, "", new List<string>() {"plane"}));
     }
 
     void Start()

@@ -4,6 +4,7 @@ using TMPro; // For TextMesh Pro
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System.Linq;
+using UIScripts;
 using Unity.Robotics.UrdfImporter;
 
 public class ShowHierarchyMenu : MonoBehaviour
@@ -13,6 +14,7 @@ public class ShowHierarchyMenu : MonoBehaviour
     public GameObject hierarchyPanel; // Assign the hierarchy panel GameObject here
 
     public MotorPopupManager motorPopupManager;
+    public AddConstraintController _addConstraintController;
 
     private List<string> motorList = new List<string> {"DoublyFedInduction", "ExtExcitedDc", "ExtExcitedSynch", "PermExcitedDc", "PermMagnetSynch", "SeriesDc", "ShuntDc", "SquirrelCageInduction", "SynchReluctance" };
     private static Dictionary<(int robotId, string linkName), Dictionary<string, object>> LinkMotorSelections = new Dictionary<(int robotId, string linkName), Dictionary<string, object>>();
@@ -33,16 +35,19 @@ public class ShowHierarchyMenu : MonoBehaviour
     public void OnPopulateButtonClick()
     {
         PopulateFinalLists();
-
+        _addConstraintController.PopulateConstraintStringsList();
+        
         List<string> names = GetMotorNames();
         List<int> ids = GetRobotId();
         List<string> links = GetLinkNames();
         List<Dictionary<string, object>> parameters = GetMotorParameters();
+        List<string> constraints = _addConstraintController.constraintStrings;
 
         PopUpController.Instance.ShowMessage("Motor Names: " + string.Join(", ", names));
         PopUpController.Instance.ShowMessage("Robot IDs: " + string.Join(", ", ids));
         PopUpController.Instance.ShowMessage("Link Names: " + string.Join(", ", links));
         PopUpController.Instance.ShowMessage("Motor Parameters: " + string.Join(", ", parameters.Select(p => p.ToString())));
+        PopUpController.Instance.ShowMessage("Constraints: " + string.Join(", ", constraints));
     }
 
     private void CreateHierarchyItems()
