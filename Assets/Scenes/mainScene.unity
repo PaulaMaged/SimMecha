@@ -1106,6 +1106,7 @@ MonoBehaviour:
   _linkDropdowns: {fileID: 1141826320}
   _constraintDropdowns: {fileID: 664138598}
   _confirmButton: {fileID: 1591193774}
+  constraintStrings: []
 --- !u!4 &140751336
 Transform:
   m_ObjectHideFlags: 0
@@ -2967,7 +2968,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2115287684}
   m_HandleRect: {fileID: 2115287683}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4502,7 +4503,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 120
+  m_Spacing: 150
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -8212,6 +8213,7 @@ MonoBehaviour:
   contentTransform: {fileID: 904229790}
   hierarchyPanel: {fileID: 709513113}
   motorPopupManager: {fileID: 1761855626}
+  _addConstraintController: {fileID: 140751335}
 --- !u!224 &1528140084
 RectTransform:
   m_ObjectHideFlags: 0
