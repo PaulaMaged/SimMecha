@@ -24,7 +24,7 @@ public class ShowHierarchyMenu : MonoBehaviour
     private static List<int> robotId = new List<int>();
     private static List<string> linkNames = new List<string>();
     private static List<Dictionary<string, object>> motorParameters = new List<Dictionary<string, object>>();
-
+    public RuntimeURDFLoader RuntimeURDFLoader;
 
     void Start()
     {
@@ -35,19 +35,40 @@ public class ShowHierarchyMenu : MonoBehaviour
     public void OnPopulateButtonClick()
     {
         PopulateFinalLists();
+        List<GameObject> importedRobots = RuntimeURDFLoader.ImportedRobots;
+        List<RobotModel> newImportedRobots = RuntimeURDFLoader.NewImportedRobots;
+        List<string> urdfFilePaths = RuntimeURDFLoader.urdfFilePaths; 
+        Dictionary<int, GameObject> robotIdToGameObject = RuntimeURDFLoader.RobotIdToGameObject;
         _addConstraintController.PopulateConstraintStringsList();
-        
+
         List<string> names = GetMotorNames();
         List<int> ids = GetRobotId();
         List<string> links = GetLinkNames();
         List<Dictionary<string, object>> parameters = GetMotorParameters();
         List<string> constraints = _addConstraintController.constraintStrings;
 
-        PopUpController.Instance.ShowMessage("Motor Names: " + string.Join(", ", names));
-        PopUpController.Instance.ShowMessage("Robot IDs: " + string.Join(", ", ids));
-        PopUpController.Instance.ShowMessage("Link Names: " + string.Join(", ", links));
-        PopUpController.Instance.ShowMessage("Motor Parameters: " + string.Join(", ", parameters.Select(p => p.ToString())));
         PopUpController.Instance.ShowMessage("Constraints: " + string.Join(", ", constraints));
+
+        Debug.Log("URDF File Paths: " + string.Join(", ", urdfFilePaths));
+        foreach (var robot in importedRobots)
+        {
+            Debug.Log($"- Robot GameObject: {robot.name}");
+        }
+        Debug.Log("New Imported Robots:");
+        foreach (var robotModel in newImportedRobots)
+        {
+            Debug.Log($"- Robot ID: {robotModel.RobotId}, URL: {robotModel.URL}, Links: {string.Join(", ", robotModel.Links)}");
+        }
+
+        Debug.Log("Robot ID to GameObject Mapping:");
+        foreach (var kvp in robotIdToGameObject)
+        {
+            Debug.Log($"- Robot ID: {kvp.Key}, GameObject: {kvp.Value.name}");
+        }
+        Debug.Log("Motor Names: " + string.Join(", ", names));
+        Debug.Log("Robot IDs: " + string.Join(", ", ids));
+        Debug.Log("Link Names: " + string.Join(", ", links));
+        Debug.Log("Motor Parameters: " + string.Join(", ", parameters.Select(p => p.ToString())));
     }
 
     private void CreateHierarchyItems()
@@ -171,8 +192,6 @@ public class ShowHierarchyMenu : MonoBehaviour
 
         LinkMotorSelections[key]["motorName"] = motorSelection;
 
-        PopUpController.Instance.ShowMessage($"Stored selection: {robotId} -> {linkSelection} -> {motorSelection}");
-
         motorPopupManager.ShowMotorPopup(robotId, linkSelection, motorSelection, LinkMotorSelections[key]);
 
     }
@@ -219,6 +238,10 @@ public class ShowHierarchyMenu : MonoBehaviour
             deleteMotorLinkButton.gameObject.SetActive(!deleteMotorLinkButton.gameObject.activeSelf);
         }
     }
+    public void ClearLinkMotorSelections()
+    {
+        LinkMotorSelections.Clear(); // or similar logic to clear selections
+    }
 
     public Dictionary<(int robotId, string linkName), Dictionary<string, object>> GetLinkMotorSelections()
     {
@@ -258,8 +281,7 @@ public class ShowHierarchyMenu : MonoBehaviour
 
     public static void PopulateFinalLists()
     {
-        PopUpController.Instance.ShowMessage("PopulateFinalLists called");
-        PopUpController.Instance.ShowMessage($"LinkMotorSelections count: {LinkMotorSelections.Count}");
+
 
         foreach (var parentKey in LinkMotorSelections.Keys)
         {
@@ -278,7 +300,6 @@ public class ShowHierarchyMenu : MonoBehaviour
             motorParameters.Add(currentMotorParam);
         }
 
-        PopUpController.Instance.ShowMessage("PopulateFinalLists finished");
     }
 
     public List<string> GetMotorNames()

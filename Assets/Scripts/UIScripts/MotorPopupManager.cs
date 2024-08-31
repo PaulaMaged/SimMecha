@@ -70,7 +70,9 @@ public class MotorPopupManager : MonoBehaviour
         Button confirmButton = motorPopupInstance.GetComponentInChildren<Button>(true);
         if (confirmButton != null)
         {
-            confirmButton.onClick.AddListener(() => ConfirmPopup(robotId, linkName, linkMotorSelections));
+            confirmButton.onClick.AddListener(() => ConfirmPopup(robotId, linkName, linkMotorSelections, motorType));
+
+
         }
         else
         {
@@ -167,9 +169,10 @@ public class MotorPopupManager : MonoBehaviour
             .FirstOrDefault(inputField => inputField.name == fieldName);
     }
 
-    public void ConfirmPopup(int robotId, string linkName, Dictionary<string, object> motorAttributes)
+    public void ConfirmPopup(int robotId, string linkName, Dictionary<string, object> motorAttributes, string motorName)
     {
         Debug.Log($"ConfirmPopup called.");
+        PopUpController.Instance.ShowMessage($"Stored selection: {robotId} -> {linkName} -> {motorName}");
 
         try
         {

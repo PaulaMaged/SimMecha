@@ -27,7 +27,7 @@ namespace UIScripts
         private List<List<TMP_Dropdown.OptionData>> _allLinks = new();
 
         private Dictionary<int, List<string>> selectedLinksByRobot = new();
-        private Dictionary<((int robotId, string link), (int robotId, string link)), string> _linkConstraints;
+        public Dictionary<((int robotId, string link), (int robotId, string link)), string> _linkConstraints;
         public List<string> constraintStrings = new();
 
         private void Awake()
