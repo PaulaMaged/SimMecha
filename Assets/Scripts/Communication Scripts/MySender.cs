@@ -17,8 +17,6 @@ public class MySender : MonoBehaviour
 
     public static MySender Instance;
 
-    public static int x = 0;
-    public static bool started = false;
     void Awake()
     {
         // Ensure there's only one instance of ReceiverScript
@@ -32,26 +30,17 @@ public class MySender : MonoBehaviour
         }
     }
 
-    public void StartSimulation()
+    public async void StartSimulation()
     {
         objectData = obj.GetComponent<ObjectData>();
         runPythonScript = pythonRun.GetComponent<RunPythonScript>();
 
         //runPythonScript.RunPython();
+        //await Task.Delay(50);
 
         Connect("127.0.0.1", 301); // Replace with your server IP and port
 
         objectData.SendAllData();
-        //started = true;
-    }
-
-    private void Update()
-    {
-        if (started)
-        {
-            SendMessage(x++.ToString());
-            Delayed(200);
-        }
     }
 
     void Connect(string server, int port)

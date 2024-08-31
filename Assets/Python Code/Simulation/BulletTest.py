@@ -24,7 +24,7 @@ def convert_link_names(links_received, robot_nums):
         links = link_names[robot_index]
         try:
             joint_ind = links.index(link)
-            joint_nums.append(joint_ind)
+            joint_nums.append(joint_ind - 1)
         except ValueError:
             print(f'Link name "{link}" not found!')
 
@@ -47,7 +47,7 @@ def init():
 
     for i in range(len(urls)):
         robot_id.append(b.load_robot(urls[i], positions[i], orientations[i], scalings[i]))
-        link_names.append(b.get_joint_names(robot_id[i]))
+        link_names.append(b.get_link_names(robot_id[i]))
 
     mot.motorNames, correspond_robot_num, links_received, mot.motor_params = TCP.parse_motor_message(TCP.messages)
 
@@ -56,8 +56,9 @@ def init():
 
     joint1_nums = convert_link_names(links1, robot1_nums)
     joint2_nums = convert_link_names(links2, robot2_nums)
-    joint1_nums = [joint1_nums - 1 for joint1_nums in joint1_nums]
-    joint2_nums = [joint2_nums - 1 for joint2_nums in joint2_nums]
+
+    #joint1_nums = [joint1_nums - 1 for joint1_nums in joint1_nums]
+    #joint2_nums = [joint2_nums - 1 for joint2_nums in joint2_nums]
     print(joint1_nums)
     print(joint2_nums)
     # convert_link_names
@@ -66,24 +67,25 @@ def init():
         robot2 = plane_id if robot2_nums[i] == -1 else robot_id[robot2_nums[i]]
         b.create_joint_constraint(robot1, joint1_nums[i], robot2, joint2_nums[i], constraint_types[i])
 
-    mot.motor_process = True
+    if len(mot.motorNames) > 0:
+        mot.motor_process = True
+        print('motor process started')
 
 
 def update():
     global robot_id, correspond_robot_num, correspond_joint_num
-
-    for i in range(len(mot.motorClasses)):
-        robot = robot_id[correspond_robot_num[i]]
-        b.set_joint_speed(robot, correspond_joint_num[i], mot.omega[i], mot.torque[i])
+    if len(mot.motorClasses) > 0:
+        for i in range(len(mot.motorClasses)):
+            robot = robot_id[correspond_robot_num[i]]
+            b.set_joint_speed(robot, correspond_joint_num[i], mot.omega[i], mot.torque[i])
 
     p.stepSimulation()
     time.sleep(1. / 240.)
 
     if p.getConnectionInfo(physicsClient)['isConnected'] == 0:
-        print("PyBullet window closed.")
         TCP.sock.close()
-        print("socket should have been closed")
         os._exit(0)
+
 
 def main():
     init()

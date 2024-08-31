@@ -198,6 +198,9 @@ namespace UIScripts
             }
         }
 
-        public List<string> GetConstraintStrings() {  return constraintStrings; }
+        public List<string> GetConstraintStrings()
+        {
+            return constraintStrings;
+        }
     }
 }

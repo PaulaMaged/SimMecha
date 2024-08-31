@@ -145,7 +145,7 @@ public class ObjectData : MonoBehaviour
 
     public async void SendMotorData()  //not yet implemented
     {
-        showHierarchyMenu.PopulateHierarchy();
+        showHierarchyMenu.PopulateFinalLists();
 
         motorNames = showHierarchyMenu.GetMotorNames();
         robotNums = showHierarchyMenu.GetRobotId();
@@ -185,8 +185,8 @@ public class ObjectData : MonoBehaviour
     public void SendAllData()
     {
         sendRobotData();
-        //SendMotorData();
-        //SendConstraintsData();
+        SendMotorData();
+        SendConstraintsData();
     }
 
 

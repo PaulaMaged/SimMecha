@@ -7,28 +7,42 @@ import numpy as np
 from Simulation import TCP
 from scipy.spatial.transform import Rotation as R
 from MotorTypes import MotorMain as mot
-
+import os
+import sys
 
 def connect_to_pybullet():
     physicsClient = p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     return physicsClient
 
+def resource_path(relative_path):
+    """ Get the absolute path to a resource, works for dev and for PyInstaller bundled app """
+    if hasattr(sys, '_MEIPASS'):
+        # If the app is bundled by PyInstaller
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 
 def load_environment():
-    planeId = p.loadURDF("plane.urdf")
+    plane_path = resource_path("plane.urdf")
+    planeId = p.loadURDF(plane_path)
     return planeId
 
 
-def get_joint_names(robot_id):
-    joint_num = p.getNumJoints(robot_id)
-    joint_names = []
-    for i in range(joint_num):
+def get_link_names(robot_id):
+    link_num = p.getNumJoints(robot_id)
+    link_names = []
+    base_info = p.getBodyInfo(robot_id)
+    base_name = base_info[0].decode("utf-8")  # Decode bytes to string
+    link_names.append(base_name)
+
+    for i in range(link_num):
         joint_info = p.getJointInfo(robot_id, i)
         joint_name = joint_info[12]
         joint_name = joint_name.decode('utf-8')
-        joint_names.append(joint_name)
-    return joint_names
+        link_names.append(joint_name)
+    print(f'joint names: {link_names}')
+    return link_names
 
 # axes orientation in unity are different than pybullet
 def convert_coords(unity_coords):
@@ -194,7 +208,7 @@ def py_main():
 def main_test():
     connect_to_pybullet()
     robot_id = p.loadURDF("C:/Users/Ayman Tarek/Desktop/pubullet_data/pybullet_data/franka_panda/panda.urdf", globalScaling=3)
-    x = get_joint_names(robot_id)
+    x = get_link_names(robot_id)
     print(x)
     while True:
         p.stepSimulation()

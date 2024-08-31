@@ -20,6 +20,7 @@ motor_process = False
 def init():
     global env, state_variables, env_limits, motorClasses, omega, torque, motorNames, fig, axes, plot_lines, data_dict, steps, all_states
     while not motor_process:
+        time.sleep(1)
         continue
 
     for i, motorName in enumerate(motorNames):

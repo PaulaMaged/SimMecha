@@ -202,13 +202,7 @@ public class RuntimeURDFLoader : MonoBehaviour
         OpenFileAndImportURDF();
     }
 
-    public List<GameObject> GetImportedRobots()
-    {
-        return ImportedRobots;
-    }
+    public List<GameObject> GetImportedRobots() { return ImportedRobots; }
 
-    public List<string> GetUrls()
-    {
-        return urdfFilePaths;
-    }
+    public List<string> GetUrls() { return urdfFilePaths; }
 }
