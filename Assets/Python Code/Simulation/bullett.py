@@ -92,7 +92,7 @@ def get_joint_axis(robot_id, joint_index):
 def create_joint_constraint(first_obj, first_joint, second_obj, second_joint, joint_type):
     p_joint_type = None
     joint_axis = None
-
+    print(f'{first_obj} {first_joint}, {second_obj} {second_joint}')
     if joint_type == 'prismatic':
         p_joint_type = p.JOINT_PRISMATIC
     elif joint_type == 'revolute':

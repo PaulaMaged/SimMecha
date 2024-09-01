@@ -30,13 +30,12 @@ public class MySender : MonoBehaviour
         }
     }
 
-    public async void StartSimulation()
+    public void StartSimulation()
     {
         objectData = obj.GetComponent<ObjectData>();
         runPythonScript = pythonRun.GetComponent<RunPythonScript>();
 
-        //runPythonScript.RunPython();
-        //await Task.Delay(50);
+        runPythonScript.RunPython();
 
         Connect("127.0.0.1", 301); // Replace with your server IP and port
 

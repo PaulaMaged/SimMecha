@@ -1,49 +1,42 @@
-('D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
- 'Code\\build\\main\\PYZ-00.pyz',
+('C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\build\\main\\PYZ-00.pyz',
  [('MotorTypes', '-', 'PYMODULE'),
   ('MotorTypes.DoublyFedInduction',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\DoublyFedInduction.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python '
+   'exe\\MotorTypes\\DoublyFedInduction.py',
    'PYMODULE'),
   ('MotorTypes.ExtExcitedDc',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\ExtExcitedDc.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\MotorTypes\\ExtExcitedDc.py',
    'PYMODULE'),
   ('MotorTypes.ExtExcitedSynch',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\ExtExcitedSynch.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python '
+   'exe\\MotorTypes\\ExtExcitedSynch.py',
    'PYMODULE'),
   ('MotorTypes.GraphPlot',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\GraphPlot.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\MotorTypes\\GraphPlot.py',
    'PYMODULE'),
   ('MotorTypes.MotorMain',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\MotorMain.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\MotorTypes\\MotorMain.py',
    'PYMODULE'),
   ('MotorTypes.PermExcitedDc',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\PermExcitedDc.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\MotorTypes\\PermExcitedDc.py',
    'PYMODULE'),
   ('MotorTypes.PermMagnetSynch',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\PermMagnetSynch.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python '
+   'exe\\MotorTypes\\PermMagnetSynch.py',
    'PYMODULE'),
   ('MotorTypes.SeriesDc',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\SeriesDc.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\MotorTypes\\SeriesDc.py',
    'PYMODULE'),
   ('MotorTypes.ShuntDc',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\ShuntDc.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\MotorTypes\\ShuntDc.py',
    'PYMODULE'),
   ('MotorTypes.SquirrelCageInduction',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\SquirrelCageInduction.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python '
+   'exe\\MotorTypes\\SquirrelCageInduction.py',
    'PYMODULE'),
   ('MotorTypes.SynchReluctance',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\MotorTypes\\SynchReluctance.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python '
+   'exe\\MotorTypes\\SynchReluctance.py',
    'PYMODULE'),
   ('PIL', 'c:\\python38\\lib\\site-packages\\PIL\\__init__.py', 'PYMODULE'),
   ('PIL.BlpImagePlugin',
@@ -269,16 +262,13 @@
    'PYMODULE'),
   ('Simulation', '-', 'PYMODULE'),
   ('Simulation.BulletTest',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\Simulation\\BulletTest.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\Simulation\\BulletTest.py',
    'PYMODULE'),
   ('Simulation.TCP',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\Simulation\\TCP.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\Simulation\\TCP.py',
    'PYMODULE'),
   ('Simulation.bullett',
-   'D:\\Unity Projects\\Physics Simulation\\Assets\\Python '
-   'Code\\Simulation\\bullett.py',
+   'C:\\Users\\Ayman Tarek\\Desktop\\Python exe\\Simulation\\bullett.py',
    'PYMODULE'),
   ('__future__', 'c:\\python38\\lib\\__future__.py', 'PYMODULE'),
   ('_compat_pickle', 'c:\\python38\\lib\\_compat_pickle.py', 'PYMODULE'),

@@ -18,7 +18,7 @@ def convert_link_names(links_received, robot_nums):
     joint_nums = []
     for i, link in enumerate(links_received):
         if link == 'plane':
-            joint_nums.append(0)
+            joint_nums.append(-1)
             continue
         robot_index = robot_nums[i]
         links = link_names[robot_index]
@@ -28,7 +28,6 @@ def convert_link_names(links_received, robot_nums):
         except ValueError:
             print(f'Link name "{link}" not found!')
 
-    print('joint_nums:', joint_nums)
     return joint_nums
 
 def init():
@@ -57,10 +56,6 @@ def init():
     joint1_nums = convert_link_names(links1, robot1_nums)
     joint2_nums = convert_link_names(links2, robot2_nums)
 
-    #joint1_nums = [joint1_nums - 1 for joint1_nums in joint1_nums]
-    #joint2_nums = [joint2_nums - 1 for joint2_nums in joint2_nums]
-    print(joint1_nums)
-    print(joint2_nums)
     # convert_link_names
     for i in range(len(robot1_nums)):
         robot1 = plane_id if robot1_nums[i] == -1 else robot_id[robot1_nums[i]]

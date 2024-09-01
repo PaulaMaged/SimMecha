@@ -1,23 +1,25 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Robotics.UrdfImporter;
 using SFB; // StandaloneFileBrowser namespace
-using System.Collections.Generic;
-using RuntimeInspectorNamespace;
 using TMPro;
+using RuntimeInspectorNamespace;
+using UIScripts;
 
 public class RobotIdentifier : MonoBehaviour
 {
     public int robotId;
 }
+
 public class RobotModel
 {
     public GameObject Robot;
     public int RobotId;
     public string URL;
     public List<string> Links;
-    // Dictionary<string, MotorBase>;
 
     public RobotModel(GameObject robot, int robotId, string url, List<string> links)
     {
@@ -33,7 +35,7 @@ public class RuntimeURDFLoader : MonoBehaviour
     public ImportSettings importSettings;
     public static List<GameObject> ImportedRobots;
     public static List<RobotModel> NewImportedRobots;
-    private List<string> urdfFilePaths = new List<string>();
+    public List<string> urdfFilePaths = new List<string>();
     private int nextRobotId = 0;
     public static Dictionary<int, GameObject> RobotIdToGameObject = new Dictionary<int, GameObject>();
 
@@ -44,8 +46,11 @@ public class RuntimeURDFLoader : MonoBehaviour
 
     private string urdfFilePath;
     private GameObject currentImportedRobot;
-
+    public Button deleteButton;
     public RuntimeHierarchy runtimeHierarchy;
+    // Add a reference to ShowHierarchyMenu
+    public ShowHierarchyMenu showHierarchyMenu;
+    public AddConstraintController AddConstraintController;
 
     private void Awake()
     {
@@ -70,6 +75,7 @@ public class RuntimeURDFLoader : MonoBehaviour
 
         yAxisButton.onClick.AddListener(() => OnAxisSelected(ImportSettings.axisType.yAxis));
         zAxisButton.onClick.AddListener(() => OnAxisSelected(ImportSettings.axisType.zAxis));
+        deleteButton.onClick.AddListener(DeleteSelectedRobot);
 
         scaleInputField.onEndEdit.AddListener(OnScaleInputChanged);
 
@@ -90,7 +96,7 @@ public class RuntimeURDFLoader : MonoBehaviour
         }
         else
         {
-            Debug.LogError("No file selected.");
+            PopUpController.Instance.ShowMessage("No file selected.");
         }
     }
 
@@ -117,32 +123,37 @@ public class RuntimeURDFLoader : MonoBehaviour
                 robot.transform.SetAsLastSibling();
 
                 RobotIdentifier identifier = robot.AddComponent<RobotIdentifier>();
-                identifier.robotId = nextRobotId++;
 
-                RobotIdToGameObject[identifier.robotId] = robot;
+                // Assign the ID based on the next available index
+                identifier.robotId = nextRobotId;
+                RobotIdToGameObject[nextRobotId] = robot;
                 ImportedRobots.Add(robot);
 
                 List<string> robotLinks = new List<string>();
                 GetLinksFromRobot(robotLinks, robot.transform);
-                
-                NewImportedRobots.Add(new RobotModel(robot, identifier.robotId, urdfFilePath, robotLinks));
+
+                NewImportedRobots.Add(new RobotModel(robot, nextRobotId, urdfFilePath, robotLinks));
 
                 DisableArticulationBodies(robot);
 
                 currentImportedRobot = robot;
 
+                // Increment nextRobotId for the next robot
+                nextRobotId++;
+
                 Debug.Log($"URDF model imported and positioned successfully with ID: {identifier.robotId}");
             }
             else
             {
-                Debug.LogError("Failed to import URDF model.");
+                PopUpController.Instance.ShowMessage("Failed to import URDF model.");
             }
         }
         else
         {
-            Debug.LogError("Invalid URDF file path.");
+            PopUpController.Instance.ShowMessage("Invalid URDF file path.");
         }
     }
+
 
     private void DisableArticulationBodies(GameObject robot)
     {
@@ -166,25 +177,173 @@ public class RuntimeURDFLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("No object selected in the hierarchy.");
+                PopUpController.Instance.ShowMessage("No object selected in the hierarchy.");
             }
         }
         else
         {
-            Debug.LogWarning("Invalid scale value.");
+            PopUpController.Instance.ShowMessage("Invalid scale value.");
         }
     }
-    
+
+
+    public void DeleteSelectedRobot()
+    {
+        if (runtimeHierarchy.CurrentSelection.Count > 0)
+        {
+            GameObject selectedObject = runtimeHierarchy.CurrentSelection[0].gameObject;
+            RobotIdentifier identifier = selectedObject.GetComponent<RobotIdentifier>();
+
+            if (identifier != null)
+            {
+                int robotId = identifier.robotId;
+
+                // Remove the URDF file path associated with the robot
+                if (robotId < urdfFilePaths.Count)
+                {
+                    Debug.Log($"Removing URDF file path: {urdfFilePaths[robotId]}");
+                    urdfFilePaths.RemoveAt(robotId);
+                }
+
+                RobotIdToGameObject.Remove(robotId);
+                ImportedRobots.Remove(selectedObject);
+                NewImportedRobots.RemoveAll(robot => robot.RobotId == robotId);
+
+                ClearMotorLinkSelectionsForRobot(robotId);
+                ClearLinkConstraintsForRobot(robotId); 
+
+                Destroy(selectedObject);
+
+                ReassignRobotIds();
+
+                Debug.Log($"Robot with ID {robotId} deleted successfully.");
+            }
+            else
+            {
+                PopUpController.Instance.ShowMessage("You cannot delete this object!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No object selected in the hierarchy.");
+        }
+    }
+
+    private void ClearLinkConstraintsForRobot(int robotId)
+    {
+        if (showHierarchyMenu == null)
+        {
+            Debug.LogError("ShowHierarchyMenu reference is missing.");
+            return;
+        }
+
+        var linkConstraints = AddConstraintController._linkConstraints;
+
+        var keysToRemove = linkConstraints.Keys
+            .Where(key =>
+            {
+                var (firstTuple, secondTuple) = key;
+                return firstTuple.robotId == robotId || secondTuple.robotId == robotId;
+            })
+            .ToList();
+
+        Debug.Log($"Found {keysToRemove.Count} constraints to remove for robot ID {robotId}.");
+
+        foreach (var key in keysToRemove)
+        {
+            linkConstraints.Remove(key);
+            Debug.Log($"Removed link constraint for robot ID {robotId}, links: {key.Item1.link} and {key.Item2.link}.");
+        }
+
+        AddConstraintController._linkConstraints = linkConstraints;
+        Debug.Log($"Cleared link constraints for robot ID {robotId}.");
+    }
+
+    private void ReassignRobotIds()
+    {
+        for (int i = 0; i < ImportedRobots.Count; i++)
+        {
+            var robot = ImportedRobots[i];
+            var identifier = robot.GetComponent<RobotIdentifier>();
+
+            if (identifier != null)
+            {
+                identifier.robotId = i;
+                RobotIdToGameObject[i] = robot;
+
+                var robotLinks = new List<string>();
+                GetLinksFromRobot(robotLinks, robot.transform);
+                var robotModel = NewImportedRobots.FirstOrDefault(r => r.RobotId == i);
+                if (robotModel != null)
+                {
+                    robotModel.Robot = robot;
+                    robotModel.URL = urdfFilePaths.ElementAtOrDefault(i); 
+                    robotModel.Links = robotLinks;
+                }
+            }
+        }
+
+        nextRobotId = ImportedRobots.Count;
+
+        var updatedLinkMotorSelections = new Dictionary<(int robotId, string linkName), Dictionary<string, object>>();
+
+        foreach (var entry in showHierarchyMenu.GetLinkMotorSelections())
+        {
+            var oldKey = entry.Key;
+            var linkName = oldKey.linkName;
+            var motorAttributes = entry.Value;
+
+            if (RobotIdToGameObject.TryGetValue(oldKey.robotId, out var robot))
+            {
+                int newRobotId = ImportedRobots.IndexOf(robot);
+                updatedLinkMotorSelections[(newRobotId, linkName)] = motorAttributes;
+            }
+        }
+
+        showHierarchyMenu.ClearLinkMotorSelections();
+        foreach (var selection in updatedLinkMotorSelections)
+        {
+            showHierarchyMenu.UpdateLinkMotorSelections(selection.Key.robotId, selection.Key.linkName, selection.Value);
+        }
+
+        Debug.Log("Robot IDs reassigned and link-motor selections updated.");
+    }
+
+
+    private void ClearMotorLinkSelectionsForRobot(int robotId)
+    {
+        if (showHierarchyMenu == null)
+        {
+            Debug.LogError("ShowHierarchyMenu reference is missing.");
+            return;
+        }
+
+        var linkMotorSelections = showHierarchyMenu.GetLinkMotorSelections();
+
+        var keysToRemove = linkMotorSelections.Keys
+            .Where(key => key.robotId == robotId)
+            .ToList();
+
+        Debug.Log($"Found {keysToRemove.Count} entries to remove for robot ID {robotId}.");
+
+        foreach (var key in keysToRemove)
+        {
+            linkMotorSelections.Remove(key);
+            Debug.Log($"Removed motor link selection for robot ID {robotId}, link: {key.linkName}.");
+        }
+
+        Debug.Log($"Cleared motor link selections for robot ID {robotId}.");
+    }
+
+
+
     private static void GetLinksFromRobot(List<string> links, Transform parent)
     {
-        // Check if the object has a component named "UrdfLink"
         if (parent.GetComponent<UrdfLink>() != null)
         {
-            // Add the link's name to the dropdown options
             links.Add(parent.name);
         }
 
-        // Recursively check the children
         foreach (Transform child in parent)
         {
             GetLinksFromRobot(links, child);
@@ -194,7 +353,6 @@ public class RuntimeURDFLoader : MonoBehaviour
     private void ApplyScale(GameObject parent, float scaleValue)
     {
         parent.transform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
-
     }
 
     public void OnImportButtonClicked()
@@ -202,7 +360,7 @@ public class RuntimeURDFLoader : MonoBehaviour
         OpenFileAndImportURDF();
     }
 
-    public List<GameObject> GetImportedRobots() { return ImportedRobots; }
+    public List<GameObject> GetImportedRobots() {  return ImportedRobots; }
 
     public List<string> GetUrls() { return urdfFilePaths; }
 }

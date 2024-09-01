@@ -4,6 +4,7 @@ import time
 
 import matplotlib.pyplot as plt
 
+from MotorTypes import MotorMain
 
 show_graph = False
 
