@@ -12,7 +12,7 @@ public class RunPythonScript : MonoBehaviour
     private string pythonScriptPath = "Assets/Python Code/main.py";
 
     // Path to the Python executable
-    private string pythonExePath = @"D:\Paula\C (Extension)\Program Files\Python\python.exe";
+    private string pythonExePath = null;
 
     // Path to the log file
     private string logFilePath = "Assets/Python Code/log.txt";
