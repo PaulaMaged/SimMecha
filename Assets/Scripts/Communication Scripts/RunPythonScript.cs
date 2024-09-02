@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.Robotics.UrdfImporter;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using System.Threading.Tasks;
 
 public class RunPythonScript : MonoBehaviour
 {
@@ -20,8 +21,7 @@ public class RunPythonScript : MonoBehaviour
         // Log the start of the process
         Log("Starting Python script...");
 
-        // Search for python.exe in common locations
-        pythonExePath = "Assets/Python Code/dist/main/main.exe";
+        pythonExePath = "Assets/Python Code/output/main/main.exe";
 
         if (pythonExePath == null)
         {

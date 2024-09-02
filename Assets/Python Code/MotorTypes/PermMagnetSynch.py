@@ -6,6 +6,7 @@ from gym_electric_motor.reference_generators import LaplaceProcessReferenceGener
 import matplotlib.pyplot as plt
 from MotorTypes import MotorMain as mot
 
+action_factor = 200
 
 state_variables = ['omega', 'torque', 'i_sd', 'i_sq', 'i_a', 'i_b', 'i_c', 'u_sd', 'u_sq', 'u_a', 'u_b', 'u_c', 'u_sup']
 

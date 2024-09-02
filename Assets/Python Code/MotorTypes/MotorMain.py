@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from MotorTypes.GraphPlot import init_plotting
 from Simulation import bullett, BulletTest, TCP
 from MotorTypes import (ExtExcitedDc, ExtExcitedSynch, SeriesDc, ShuntDc, SynchReluctance, SquirrelCageInduction, PermExcitedDc, PermMagnetSynch, DoublyFedInduction, GraphPlot)
+import run_user_script
 
 env, env_limits, state_variables, motorClasses = [], [], [], []
 
@@ -17,10 +18,11 @@ step = -1
 
 motor_process = False
 
+user_script = run_user_script.load_script()
+
 def init():
     global env, state_variables, env_limits, motorClasses, omega, torque, motorNames, fig, axes, plot_lines, data_dict, steps, all_states
     while not motor_process:
-        time.sleep(1)
         continue
 
     for i, motorName in enumerate(motorNames):
@@ -40,17 +42,21 @@ def init():
 
         init_graphs(i, f'{i+1} - {motorName}')
 
+        user_script.motor_classes = motorClasses
+        user_script.init()
 
 def update():
     global motorClasses, env, state_variables, env_limits, step, terminated, omega, torque, fig, axes, plot_lines, data_dict, steps, all_states
     step += 1
+    user_script.update_motor_voltages()
+    actions = user_script.all_volts_list
 
     for i, motorClass in enumerate(motorClasses):
         if terminated[i]:
             state, reference = env[i].reset()
+        volts = [action / motorClass.action_factor for action in actions[i]]
 
-        action = motorClass.action(step)
-        (state, reference), reward, terminated[i], truncated, _ = env[i].step(action)
+        (state, reference), reward, terminated[i], truncated, _ = env[i].step(volts)
 
         # Denormalize state variables using limits
         real_state = state * env_limits[i]

@@ -2,6 +2,7 @@ import gym_electric_motor as gem
 from gym_electric_motor.physical_systems import ConstantSpeedLoad
 from gym_electric_motor.reference_generators import LaplaceProcessReferenceGenerator
 
+action_factor = 60
 
 state_variables = ['omega', 'torque', 'i', 'u', 'u_sup']
 

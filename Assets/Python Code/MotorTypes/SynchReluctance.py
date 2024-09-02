@@ -3,6 +3,8 @@ import numpy as np
 from gym_electric_motor.reference_generators import LaplaceProcessReferenceGenerator, SinusoidalReferenceGenerator
 import matplotlib.pyplot as plt
 
+action_factor = 200
+
 state_variables = ['omega', 'torque', 'i_sa', 'i_sb', 'i_sc', 'i_sd', 'i_sq', 'u_sa', 'u_sb', 'u_sc', 'u_sd', 'u_sq', 'epsilon', 'u_sup']
 
 def env(motor_parameters, i):

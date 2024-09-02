@@ -4,6 +4,8 @@ from gym_electric_motor.reference_generators import LaplaceProcessReferenceGener
 from gym_electric_motor.physical_systems import DcMotorSystem, DcPermanentlyExcitedMotor, ConstantSpeedLoad, \
     PolynomialStaticLoad, ExternalSpeedLoad, OrnsteinUhlenbeckLoad
 
+action_factor = 60
+
 state_variables = ['omega', 'torque', 'i', 'u', 'u_sup']
 
 def env(motor_parameters, i):
