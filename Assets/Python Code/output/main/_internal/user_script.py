@@ -17,18 +17,13 @@ def init():
 
 
 step = -1
+
 # you should define all motor voltages here and put each motor volts in a list inside all_volts_list
+
 def update_motor_voltages():
-    global all_volts_list, step
     step += 1
-
-    if step < 1000:
-        x = 60
-    else:
-        if ((step - 1000) // 2000) % 2 == 0:
-            x = -60
-        else:
-            x = 60
-    volts0 = [x, 60]
-
-    all_volts_list = [volts0]
+    
+    # put your voltage logic here
+    # example, if you have 2 motors, a Permanently Magnetic Synchronous motor that takes 3 volts (3 phase) and Externally Excited Dc motor that takes 2 volts
+    # you should return something in this form
+    # all_volts_list = [[float1, float2, float3], [float4, float5]]

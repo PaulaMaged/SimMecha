@@ -285,13 +285,19 @@ public class ShowHierarchyMenu : MonoBehaviour
         robotId.Clear();
         linkNames.Clear();
         motorParameters.Clear();
+        motorNames.Clear();
         foreach (var parentKey in LinkMotorSelections.Keys)
         {
 
             robotId.Add(parentKey.robotId);
             linkNames.Add(parentKey.linkName);
 
-            Dictionary<string, object> currentMotorParam = LinkMotorSelections[parentKey];
+            Dictionary<string, object> currentMotorParam = new Dictionary<string, object>();
+
+            foreach( var pair in LinkMotorSelections[parentKey])
+            {
+                currentMotorParam[pair.Key] = pair.Value;
+            }
 
             if (currentMotorParam.ContainsKey("motorName"))
             {
