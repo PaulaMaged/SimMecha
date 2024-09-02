@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class FlyThroughCamera : MonoBehaviour
 {
@@ -36,7 +37,16 @@ public class FlyThroughCamera : MonoBehaviour
         }
 
         // Zoom
-        float scroll = Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
-        transform.Translate(0, 0, scroll);
+        if (!IsMouseOverUI())
+        {
+            float scroll = Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
+            transform.Translate(0, 0, scroll);
+        }
+    }
+
+    // Method to check if the mouse is over a UI element
+    private bool IsMouseOverUI()
+    {
+        return EventSystem.current.IsPointerOverGameObject();
     }
 }
