@@ -19,7 +19,7 @@ public class ShowHierarchyMenu : MonoBehaviour
     private List<string> motorList = new List<string> {"DoublyFedInduction", "ExtExcitedDc", "ExtExcitedSynch", "PermExcitedDc", "PermMagnetSynch", "SeriesDc", "ShuntDc", "SquirrelCageInduction", "SynchReluctance" };
     private static Dictionary<(int robotId, string linkName), Dictionary<string, object>> LinkMotorSelections = new Dictionary<(int robotId, string linkName), Dictionary<string, object>>();
     // Dictionary((robotId, linkName), Dictionary<string, Object>);
-
+    private static int linkNo = 1;
     private static List<string> motorNames = new List<string>();
     private static List<int> robotId = new List<int>();
     private static List<string> linkNames = new List<string>();
@@ -104,7 +104,7 @@ public class ShowHierarchyMenu : MonoBehaviour
             TMP_Dropdown[] dropdowns = item.GetComponentsInChildren<TMP_Dropdown>();
             TMP_Dropdown linkMenuDropdown = FindDropdownByName(dropdowns, "SelectLinkMenu");
             TMP_Dropdown motorMenuDropdown = FindDropdownByName(dropdowns, "SelectMotorMenu");
-
+            linkNo = 1;
             if (linkMenuDropdown != null)
             {
                 foreach (Transform link in robot.transform)
@@ -155,12 +155,13 @@ public class ShowHierarchyMenu : MonoBehaviour
 
     private static void AddLinksToLinkMenu(TMP_Dropdown linkMenuDropdown, Transform parent)
     {
-        if (parent.GetComponent<UrdfLink>() != null)
+        if (parent.GetComponent<UrdfLink>() != null && linkNo !=1 && parent.name != "body")
         {
             linkMenuDropdown.options.Add(new TMP_Dropdown.OptionData(parent.name));
         }
         foreach (Transform child in parent)
         {
+            linkNo++;
             AddLinksToLinkMenu(linkMenuDropdown, child);
         }
     }
@@ -281,6 +282,9 @@ public class ShowHierarchyMenu : MonoBehaviour
 
     public void PopulateFinalLists()
     {
+        robotId.Clear();
+        linkNames.Clear();
+        motorParameters.Clear();
         foreach (var parentKey in LinkMotorSelections.Keys)
         {
 
@@ -304,7 +308,10 @@ public class ShowHierarchyMenu : MonoBehaviour
     {
         return motorNames; 
     }
-
+    public void SetMotorNames(List<string> motors)
+    {
+        motorNames = motors;
+    }
     public List<int> GetRobotId()
     {
         return robotId; 

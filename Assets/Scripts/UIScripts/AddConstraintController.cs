@@ -230,6 +230,7 @@ namespace UIScripts
 
         public void PopulateConstraintStringsList()
         {
+            constraintStrings.Clear();
             foreach (var keyValuePair in _linkConstraints)
                 constraintStrings.Add(
                     $"({keyValuePair.Key.Item1.robotId}, {keyValuePair.Key.Item2.robotId}, {keyValuePair.Key.Item1.link}, {keyValuePair.Key.Item2.link}, {keyValuePair.Value})");
