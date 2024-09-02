@@ -37,7 +37,7 @@ public class MySender : MonoBehaviour
 
         runPythonScript.RunPython();
 
-        Connect("127.0.0.1", 301); // Replace with your server IP and port
+        Connect("127.0.0.1", 300); // Replace with your server IP and port
 
         objectData.SendAllData();
     }

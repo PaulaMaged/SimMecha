@@ -10,7 +10,7 @@ messages = []
 starting_flag = True
 
 # handles communication between unity and python
-def start_server(host="127.0.0.1", port=301):
+def start_server(host="127.0.0.1", port=300):
     global starting_message, curr_message
     with sock as s:
         #This line sets the SO_REUSEADDR option on the socket,

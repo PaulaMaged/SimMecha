@@ -23,7 +23,7 @@ user_script = run_user_script.load_script()
 def init():
     global env, state_variables, env_limits, motorClasses, omega, torque, motorNames, fig, axes, plot_lines, data_dict, steps, all_states
     while not motor_process:
-        continue
+        time.sleep(1)
 
     for i, motorName in enumerate(motorNames):
         omega.append(0)
