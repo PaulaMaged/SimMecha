@@ -15,6 +15,9 @@ public class MySender : MonoBehaviour
     public GameObject pythonRun;
     private RunPythonScript runPythonScript;
 
+    public GameObject windowManager;
+    private WindowManager windowManagerScript;
+
     public static MySender Instance;
 
     void Awake()
@@ -34,12 +37,15 @@ public class MySender : MonoBehaviour
     {
         objectData = obj.GetComponent<ObjectData>();
         runPythonScript = pythonRun.GetComponent<RunPythonScript>();
+        windowManagerScript = windowManager.GetComponent<WindowManager>();
 
         runPythonScript.RunPython();
 
         Connect("127.0.0.1", 300); // Replace with your server IP and port
 
         objectData.SendAllData();
+
+        windowManagerScript.EmbedWindow();
     }
 
     void Connect(string server, int port)

@@ -6,7 +6,7 @@ import time
 motor_classes = []
 
 
-print("changed 4 Hello, I am the user script!")
+print("Hello, I am the user script!")
 
 all_volts_list = []
 
